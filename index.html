@@ -48,26 +48,20 @@
         <main id="main-content" class="flex-grow max-w-6xl w-full mx-auto p-4 md:p-8">
             <!-- View: Login -->
             <section id="login-view" class="py-10">
-                <div class="max-w-md mx-auto bg-white rounded-2xl shadow-xl p-8 fade-in">
-                    <div class="text-center mb-8">
+                <div class="max-w-md mx-auto bg-white rounded-2xl shadow-xl p-8 fade-in text-center">
+                    <div class="mb-8">
                         <h2 class="text-2xl font-bold mensa-text">Acesso ao Planejamento</h2>
-                        <p class="text-slate-500 text-sm mt-2">Identifique-se para gerenciar o cronograma em tempo real.</p>
+                        <p class="text-slate-500 text-sm mt-2">Utilize o seu e-mail institucional @mensa.org.br</p>
                     </div>
-                    <form onsubmit="handleLogin(event)" class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-semibold mb-1 text-slate-700">E-mail</label>
-                            <input type="email" id="login-email" required placeholder="exemplo@mensa.org.br" 
-                                class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-900 outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-semibold mb-1 text-slate-700">Nome Completo</label>
-                            <input type="text" id="login-name" required placeholder="Seu Nome" 
-                                class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-900 outline-none">
-                        </div>
-                        <button type="submit" id="login-btn" class="w-full mensa-blue text-white py-3 rounded-xl font-bold shadow-lg hover:opacity-90 transition mt-4 flex items-center justify-center gap-2">
-                            <span>Acessar Cronograma</span>
-                        </button>
-                    </form>
+                    
+                    <button onclick="handleGoogleLogin()" id="login-btn" class="w-full flex items-center justify-center gap-3 bg-white border border-slate-300 text-slate-700 py-3 px-4 rounded-xl font-semibold shadow-sm hover:bg-slate-50 transition mb-4">
+                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5">
+                        <span>Entrar com Google</span>
+                    </button>
+                    
+                    <p class="text-[10px] text-slate-400 uppercase tracking-widest leading-tight">
+                        Acesso restrito a Cláudia (Escrita) <br> e Membros Mensa (Leitura)
+                    </p>
                 </div>
             </section>
 
@@ -115,6 +109,10 @@
                         <span id="slot-tag" class="text-[10px] bg-blue-900 text-white px-2 py-0.5 rounded-full uppercase"></span>
                     </div>
 
+                    <div id="read-only-warning" class="hidden bg-red-50 text-red-700 p-3 rounded-xl text-xs font-bold border border-red-100">
+                        Apenas Cláudia pode salvar alterações no cronograma.
+                    </div>
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Responsável</label>
@@ -145,8 +143,8 @@
                     </div>
 
                     <div class="pt-4 flex gap-3">
-                        <button type="button" onclick="closeModal()" class="flex-1 bg-slate-100 text-slate-600 py-3 rounded-xl font-bold hover:bg-slate-200 transition text-sm">Cancelar</button>
-                        <button type="submit" id="submit-btn" class="flex-[2] mensa-blue text-white py-3 rounded-xl font-bold shadow-lg hover:opacity-90 transition text-sm">Salvar no Cronograma</button>
+                        <button type="button" onclick="closeModal()" class="flex-1 bg-slate-100 text-slate-600 py-3 rounded-xl font-bold hover:bg-slate-200 transition text-sm">Fechar</button>
+                        <button type="submit" id="submit-btn" class="flex-[2] mensa-blue text-white py-3 rounded-xl font-bold shadow-lg hover:opacity-90 transition text-sm">Salvar Alterações</button>
                     </div>
                 </form>
             </div>
@@ -159,12 +157,9 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // ======================================================
-        // CONFIGURAÇÃO DO FIREBASE (SUAS CREDENCIAIS OFICIAIS)
-        // ======================================================
         const firebaseConfig = {
             apiKey: "AIzaSyDspUhih_WIqNa7I6qmteUT-eu5PXo0clA",
             authDomain: "minimensa2026.firebaseapp.com",
@@ -174,12 +169,11 @@
             appId: "1:920097363105:web:6f45eb6231a6ff3b850ce0",
             measurementId: "G-MBEQDLSN5Q"
         };
-        // ======================================================
 
         const appId = 'mini-mensa-2026';
         let app, auth, db, currentUser = null, proposals = {}, selectedMonth = new Date().getMonth();
         let isCloudActive = false;
-        if (selectedMonth < 2) selectedMonth = 2; // Março em diante
+        if (selectedMonth < 2) selectedMonth = 2;
 
         const months = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 
@@ -189,32 +183,43 @@
             auth = getAuth(app);
             db = getFirestore(app);
             isCloudActive = true;
-            console.log("Firebase conectado.");
+            
+            // Listener de estado de autenticação (Online Automático)
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    const email = user.email.toLowerCase();
+                    const domain = email.split('@')[1];
+                    
+                    // Permissão: Cláudia grava tudo, outros @mensa.org.br apenas vêem
+                    if (email === 'claudia@mensa.org.br' || domain === 'mensa.org.br') {
+                        enterApp({
+                            name: user.displayName || user.email,
+                            email: email,
+                            canEdit: email === 'claudia@mensa.org.br'
+                        });
+                    } else {
+                        signOut(auth);
+                        alert("Acesso negado. Utilize um e-mail @mensa.org.br");
+                    }
+                } else {
+                    document.getElementById('login-view').classList.remove('hidden');
+                    document.getElementById('calendar-view').classList.add('hidden');
+                    document.getElementById('user-info').classList.add('hidden');
+                }
+            });
+
         } catch (e) {
             console.error("Erro na inicialização:", e);
         }
 
-        window.handleLogin = async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('login-email').value.trim().toLowerCase();
-            const name = document.getElementById('login-name').value.trim();
-            const btn = document.getElementById('login-btn');
-            
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Conectando...';
-
-            const userData = { email, name, isAdmin: email === 'claudia@mensa.org.br' };
-            localStorage.setItem('miniMensa_userData', JSON.stringify(userData));
-            
-            if (isCloudActive) {
-                try {
-                    await signInAnonymously(auth);
-                } catch (err) { 
-                    console.error("Erro no Auth:", err);
-                    alert("Erro de Autenticação: Verifique se o login anônimo está ativo no console do Firebase.");
-                }
+        window.handleGoogleLogin = async () => {
+            const provider = new GoogleAuthProvider();
+            try {
+                await signInWithPopup(auth, provider);
+            } catch (err) {
+                console.error("Erro no login Google:", err);
+                alert("Erro ao conectar com Google. Tente novamente.");
             }
-            enterApp(userData);
         };
 
         function enterApp(data) {
@@ -244,7 +249,6 @@
 
         function startDataListener() {
             if (!db) return;
-            // RULE 1: Caminho específico para este ambiente
             const proposalsRef = collection(db, 'artifacts', appId, 'public', 'data', 'proposals');
             onSnapshot(proposalsRef, (snapshot) => {
                 snapshot.forEach(doc => { proposals[doc.id] = doc.data(); });
@@ -297,17 +301,19 @@
             const id = `${dateStr}_${slotId}`;
             const data = proposals[id];
             const isClosed = data && data.status === 'closed';
+            const actionLabel = currentUser.canEdit ? (data ? 'Editar' : 'Agendar') : 'Ver Detalhes';
+            
             if (data) {
                 return `<div class="p-4 flex flex-col md:flex-row gap-3 items-center">
                     <div class="${isClosed ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-900'} font-black px-3 py-1 rounded-lg text-[10px] w-full md:w-28 text-center">${timeStr}</div>
                     <div class="flex-grow text-center md:text-left"><h4 class="font-bold text-slate-900 text-sm">${data.theme}</h4><p class="text-blue-700 text-xs">${data.teacher}</p></div>
-                    <button onclick="window.openProposalModal('${dateStr}', '${slotId}', '${timeStr}')" class="bg-slate-100 text-slate-600 px-4 py-1.5 rounded-lg text-xs font-bold">Editar</button>
+                    <button onclick="window.openProposalModal('${dateStr}', '${slotId}', '${timeStr}')" class="bg-slate-100 text-slate-600 px-4 py-1.5 rounded-lg text-xs font-bold">${actionLabel}</button>
                 </div>`;
             }
             return `<div class="p-4 flex flex-col md:flex-row gap-3 items-center">
                 <div class="bg-slate-100 text-slate-400 font-bold px-3 py-1 rounded-lg text-[10px] w-full md:w-28 text-center">${timeStr}</div>
                 <div class="flex-grow text-slate-300 italic text-xs">Vago...</div>
-                <button onclick="window.openProposalModal('${dateStr}', '${slotId}', '${timeStr}')" class="border border-dashed border-slate-200 text-slate-400 px-4 py-1.5 rounded-lg text-xs font-bold">Agendar</button>
+                <button onclick="window.openProposalModal('${dateStr}', '${slotId}', '${timeStr}')" class="border border-dashed border-slate-200 text-slate-400 px-4 py-1.5 rounded-lg text-xs font-bold">${actionLabel}</button>
             </div>`;
         }
 
@@ -317,11 +323,21 @@
             document.getElementById('form-date').value = date;
             document.getElementById('form-slot').value = slot;
             document.getElementById('modal-info').children[0].textContent = `${date.split('-').reverse().join('/')} às ${time}`;
-            document.getElementById('prof-name').value = data.teacher || currentUser.name;
+            document.getElementById('prof-name').value = data.teacher || (currentUser.canEdit ? currentUser.name : '');
             document.getElementById('class-theme').value = data.theme || '';
             document.getElementById('class-desc').value = data.desc || '';
             document.getElementById('class-link').value = data.link || '';
             document.getElementById('class-status').value = data.status || 'open';
+            
+            // Controle de permissão na UI do modal
+            const inputs = ['prof-name', 'class-theme', 'class-desc', 'class-link', 'class-status'];
+            inputs.forEach(id => document.getElementById(id).disabled = !currentUser.canEdit);
+            
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.style.display = currentUser.canEdit ? 'block' : 'none';
+            document.getElementById('read-only-warning').classList.toggle('hidden', currentUser.canEdit);
+            document.getElementById('admin-extras').classList.toggle('hidden', !currentUser.canEdit);
+
             document.getElementById('proposal-modal').classList.remove('hidden');
         };
 
@@ -329,7 +345,9 @@
 
         document.getElementById('proposal-form').onsubmit = async (e) => {
             e.preventDefault();
+            if (!currentUser.canEdit) return;
             if (!isCloudActive) return alert("Erro: Firebase não configurado.");
+            
             const date = document.getElementById('form-date').value;
             const slot = document.getElementById('form-slot').value;
             const payload = {
@@ -341,7 +359,6 @@
                 updatedAt: new Date().toISOString()
             };
             try {
-                // Caminho obrigatório conforme as regras do ambiente
                 await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'proposals', `${date}_${slot}`), payload);
                 closeModal();
             } catch (err) {
@@ -351,9 +368,6 @@
         };
 
         window.logout = () => { if (auth) signOut(auth); localStorage.clear(); window.location.reload(); };
-
-        const localData = JSON.parse(localStorage.getItem('miniMensa_userData'));
-        if (localData) enterApp(localData);
     </script>
 </body>
 </html>
