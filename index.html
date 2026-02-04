@@ -61,8 +61,9 @@
                             <input type="text" id="login-name" required placeholder="Seu Nome" 
                                 class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-900 outline-none">
                         </div>
-                        <button type="submit" class="w-full mensa-blue text-white py-3 rounded-xl font-bold shadow-lg hover:opacity-90 transition mt-4">
-                            Entrar no Sistema
+                        <div id="login-error" class="hidden text-red-600 text-xs bg-red-50 p-3 rounded-lg border border-red-100 italic"></div>
+                        <button type="submit" id="login-btn" class="w-full mensa-blue text-white py-3 rounded-xl font-bold shadow-lg hover:opacity-90 transition mt-4 flex items-center justify-center gap-2">
+                            <span>Entrar no Sistema</span>
                         </button>
                     </form>
                 </div>
@@ -154,21 +155,26 @@
         import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // CONFIGURAÇÃO MANUAL PARA GITHUB PAGES
-        // Se __firebase_config estiver indefinido, o código usa as credenciais do ambiente
+        // CONFIGURAÇÃO AUTOMÁTICA E FALLBACK
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "", // O ambiente irá preencher isso
+            apiKey: "AIzaSyAs-Example-Key-For-GitHub-Pages", // No GitHub, você precisaria da sua chave real do console do Firebase aqui se não estivesse usando o ambiente simulado.
             authDomain: "mini-mensa-2026.firebaseapp.com",
             projectId: "mini-mensa-2026",
             storageBucket: "mini-mensa-2026.appspot.com",
-            messagingSenderId: "0000000000",
-            appId: "1:0000000000:web:0000000000"
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abcdef123456"
         };
         
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'mini-mensa-2026';
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        
+        let app, auth, db;
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+        } catch (e) {
+            console.error("Erro ao inicializar Firebase:", e);
+        }
 
         let currentUser = null;
         let proposals = {};
@@ -182,10 +188,27 @@
             e.preventDefault();
             const email = document.getElementById('login-email').value.trim().toLowerCase();
             const name = document.getElementById('login-name').value.trim();
+            const errorEl = document.getElementById('login-error');
+            const btn = document.getElementById('login-btn');
+            
+            errorEl.classList.add('hidden');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Conectando...';
+
             localStorage.setItem('miniMensa_userData', JSON.stringify({ email, name }));
+            
             try {
+                // Tentativa de login anônimo para habilitar o Firestore
                 await signInAnonymously(auth);
-            } catch (err) { console.error(err); }
+            } catch (err) { 
+                console.error(err);
+                // Se falhar o Firebase, vamos tentar prosseguir apenas com o estado local para demonstração
+                // mas avisamos o usuário
+                errorEl.textContent = "Erro de conexão com o servidor. Verifique sua internet.";
+                errorEl.classList.remove('hidden');
+                btn.disabled = false;
+                btn.innerHTML = '<span>Entrar no Sistema</span>';
+            }
         };
 
         window.logout = () => {
@@ -205,14 +228,21 @@
                 startDataListener();
             } else {
                 document.getElementById('login-view').classList.remove('hidden');
+                document.getElementById('calendar-view').classList.add('hidden');
+                document.getElementById('user-info').classList.add('hidden');
             }
         });
 
         function startDataListener() {
+            if (!db) return;
             const proposalsRef = collection(db, 'artifacts', appId, 'public', 'data', 'proposals');
             onSnapshot(proposalsRef, (snapshot) => {
                 proposals = {};
                 snapshot.forEach(doc => { proposals[doc.id] = doc.data(); });
+                renderCalendar();
+                renderMonthFilters();
+            }, (error) => {
+                console.warn("Erro ao ler dados em tempo real. Modo offline/cache ativo.");
                 renderCalendar();
                 renderMonthFilters();
             });
@@ -220,7 +250,7 @@
 
         const allSaturdays = (() => {
             const sats = [];
-            let date = new Date(2026, 2, 1);
+            let date = new Date(2026, 0, 1);
             while (date.getDay() !== 6) date.setDate(date.getDate() + 1);
             while (date.getFullYear() === 2026) {
                 sats.push(new Date(date));
@@ -246,6 +276,12 @@
         function renderCalendar() {
             const container = document.getElementById('calendar-container');
             const filtered = allSaturdays.filter(d => d.getMonth() === selectedMonth);
+            
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="text-center py-10 text-slate-400">Nenhum sábado letivo encontrado para este mês.</div>`;
+                return;
+            }
+
             container.innerHTML = filtered.map(date => {
                 const dateStr = date.toISOString().split('T')[0];
                 return `<div class="bg-white rounded-2xl overflow-hidden card-shadow border border-slate-100 fade-in">
@@ -261,35 +297,55 @@
         function renderSlot(dateStr, timeStr, slotId) {
             const id = `${dateStr}_${slotId}`;
             const data = proposals[id];
-            const canEdit = !data || data.status !== 'closed' || currentUser.isAdmin;
+            const isClosed = data && data.status === 'closed';
+            
             if (data) {
                 return `<div class="p-4 md:p-6 flex flex-col md:flex-row gap-4 items-center">
-                    <div class="${data.status === 'closed' ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-900'} font-black px-3 py-1.5 rounded-lg text-xs w-full md:w-32 text-center">${timeStr}</div>
-                    <div class="flex-grow">
+                    <div class="${isClosed ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-900'} font-black px-3 py-1.5 rounded-lg text-xs w-full md:w-32 text-center">${timeStr}</div>
+                    <div class="flex-grow text-center md:text-left">
                         <h4 class="font-bold text-slate-900">${data.theme}</h4>
                         <p class="text-blue-700 text-sm">Prof. ${data.teacher}</p>
                     </div>
-                    <button onclick="window.openProposalModal('${dateStr}', '${slotId}', '${timeStr}')" class="bg-slate-100 text-slate-600 px-5 py-2 rounded-xl text-sm font-bold">Editar</button>
+                    <button onclick="window.openProposalModal('${dateStr}', '${slotId}', '${timeStr}')" 
+                        class="w-full md:w-auto bg-slate-100 text-slate-600 px-5 py-2 rounded-xl text-sm font-bold hover:bg-slate-200 transition">
+                        ${isClosed && !currentUser.isAdmin ? 'Ver Detalhes' : 'Editar'}
+                    </button>
                 </div>`;
             }
             return `<div class="p-4 md:p-6 flex flex-col md:flex-row gap-4 items-center">
                 <div class="bg-slate-100 text-slate-400 font-bold px-3 py-1.5 rounded-lg text-xs w-full md:w-32 text-center">${timeStr}</div>
-                <div class="flex-grow text-slate-300 italic text-sm">Disponível...</div>
-                <button onclick="window.openProposalModal('${dateStr}', '${slotId}', '${timeStr}')" class="border-2 border-dashed border-slate-200 text-slate-400 px-6 py-2 rounded-xl text-sm font-bold">Propor</button>
+                <div class="flex-grow text-slate-300 italic text-sm text-center md:text-left">Disponível...</div>
+                <button onclick="window.openProposalModal('${dateStr}', '${slotId}', '${timeStr}')" 
+                    class="w-full md:w-auto border-2 border-dashed border-slate-200 text-slate-400 px-6 py-2 rounded-xl text-sm font-bold hover:border-blue-300 hover:text-blue-500 transition">
+                    Propor Aula
+                </button>
             </div>`;
         }
 
         window.openProposalModal = (date, slot, time) => {
             const id = `${date}_${slot}`;
             const data = proposals[id] || {};
+            const isClosed = data && data.status === 'closed';
+            
             document.getElementById('form-date').value = date;
             document.getElementById('form-slot').value = slot;
             document.getElementById('modal-info').children[0].textContent = `${date.split('-').reverse().join('/')} às ${time}`;
+            document.getElementById('slot-tag').textContent = `Slot ${slot}`;
+            
             document.getElementById('prof-name').value = data.teacher || currentUser.name;
             document.getElementById('class-theme').value = data.theme || '';
             document.getElementById('class-desc').value = data.desc || '';
             document.getElementById('class-link').value = data.link || '';
             document.getElementById('class-status').value = data.status || 'open';
+            
+            // Bloquear edição se estiver fechado e não for admin
+            const isReadOnly = isClosed && !currentUser.isAdmin;
+            document.getElementById('prof-name').readOnly = isReadOnly;
+            document.getElementById('class-theme').readOnly = isReadOnly;
+            document.getElementById('class-desc').readOnly = isReadOnly;
+            document.getElementById('class-link').readOnly = isReadOnly;
+            document.getElementById('submit-btn').classList.toggle('hidden', isReadOnly);
+            
             document.getElementById('admin-extras').classList.toggle('hidden', !currentUser.isAdmin);
             document.getElementById('proposal-modal').classList.remove('hidden');
         };
@@ -298,18 +354,37 @@
 
         document.getElementById('proposal-form').onsubmit = async (e) => {
             e.preventDefault();
-            const id = `${document.getElementById('form-date').value}_${document.getElementById('form-slot').value}`;
-            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'proposals', id), {
-                teacher: document.getElementById('prof-name').value,
-                theme: document.getElementById('class-theme').value,
-                desc: document.getElementById('class-desc').value,
-                link: document.getElementById('class-link').value,
-                status: document.getElementById('class-status').value,
-                updatedBy: currentUser.email
-            });
-            closeModal();
+            if (!db) return;
+            
+            const date = document.getElementById('form-date').value;
+            const slot = document.getElementById('form-slot').value;
+            const id = `${date}_${slot}`;
+            
+            const btn = document.getElementById('submit-btn');
+            btn.disabled = true;
+            btn.textContent = 'Salvando...';
+
+            try {
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'proposals', id), {
+                    teacher: document.getElementById('prof-name').value,
+                    theme: document.getElementById('class-theme').value,
+                    desc: document.getElementById('class-desc').value,
+                    link: document.getElementById('class-link').value,
+                    status: document.getElementById('class-status').value,
+                    updatedBy: currentUser.email,
+                    updatedAt: new Date().toISOString()
+                });
+                closeModal();
+            } catch (err) {
+                console.error(err);
+                alert("Erro ao salvar. Verifique sua conexão.");
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Salvar';
+            }
         };
 
+        // Inicialização
         renderMonthFilters();
         renderCalendar();
     </script>
