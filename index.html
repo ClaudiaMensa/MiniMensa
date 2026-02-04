@@ -5,110 +5,144 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Planejamento Mini Mensa 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
         .mensa-blue { background-color: #002147; }
         .mensa-text { color: #002147; }
         .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        .fade-in { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="text-slate-800">
 
     <div id="app" class="min-h-screen flex flex-col">
         <!-- Header -->
-        <header class="mensa-blue text-white py-6 px-4 shadow-lg">
-            <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-                <div class="flex items-center gap-4">
-                    <div class="bg-white p-2 rounded-full">
-                        <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M50 5L10 30V70L50 95L90 70V30L50 5Z" stroke="#002147" stroke-width="8"/>
-                            <path d="M30 40L50 30L70 40V60L50 70L30 60V40Z" fill="#002147"/>
-                        </svg>
+        <header class="mensa-blue text-white py-4 px-4 shadow-lg sticky top-0 z-40">
+            <div class="max-w-6xl mx-auto flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="bg-white p-1.5 rounded-lg">
+                        <i class="fa-solid fa-brain text-blue-900 text-xl"></i>
                     </div>
                     <div>
-                        <h1 class="text-2xl font-bold tracking-tight">Mini Mensa Brasil</h1>
-                        <p class="text-blue-200 text-sm">Cronograma Educacional 2026 (Março - Dezembro)</p>
+                        <h1 class="text-lg font-bold leading-none">Mini Mensa Brasil</h1>
+                        <p class="text-blue-200 text-[10px] uppercase tracking-tighter">Cronograma Educacional 2026</p>
                     </div>
                 </div>
-                <div id="auth-status" class="text-xs bg-blue-900/50 px-3 py-1 rounded-full border border-blue-700">
-                    Conectando ao sistema...
+                <div id="user-info" class="hidden flex items-center gap-3">
+                    <span id="user-display" class="text-xs font-medium border-r border-blue-700 pr-3 hidden sm:block"></span>
+                    <button onclick="logout()" class="text-xs bg-blue-800 hover:bg-red-700 px-3 py-1 rounded-md transition">
+                        <i class="fa-solid fa-right-from-bracket"></i> Sair
+                    </button>
                 </div>
             </div>
         </header>
 
-        <main class="flex-grow max-w-6xl w-full mx-auto p-4 md:p-8">
-            <!-- Introdução -->
-            <section class="mb-8 bg-white p-6 rounded-2xl card-shadow border border-slate-100">
-                <h2 class="text-xl font-semibold mensa-text mb-2">Painel de Planejamento</h2>
-                <p class="text-slate-600">Bem-vindo ao portal de gestão da Mini Mensa. Professores podem selecionar qualquer sábado que esteja disponível (de Março a Dezembro) para propor temas e disponibilizar materiais.</p>
+        <main id="main-content" class="flex-grow max-w-6xl w-full mx-auto p-4 md:p-8">
+            <!-- View: Login (Será exibida se não logado) -->
+            <section id="login-view" class="hidden py-10">
+                <div class="max-w-md mx-auto bg-white rounded-2xl shadow-xl p-8 fade-in">
+                    <div class="text-center mb-8">
+                        <h2 class="text-2xl font-bold mensa-text">Acesso ao Planejamento</h2>
+                        <p class="text-slate-500 text-sm mt-2">Identifique-se para gerenciar as aulas de 2026</p>
+                    </div>
+                    <form onsubmit="handleLogin(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-semibold mb-1 text-slate-700">E-mail</label>
+                            <input type="email" id="login-email" required placeholder="exemplo@mensa.org.br" 
+                                class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-900 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold mb-1 text-slate-700">Nome Completo</label>
+                            <input type="text" id="login-name" required placeholder="Seu Nome" 
+                                class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-900 outline-none">
+                        </div>
+                        <button type="submit" class="w-full mensa-blue text-white py-3 rounded-xl font-bold shadow-lg hover:opacity-90 transition mt-4">
+                            Entrar no Sistema
+                        </button>
+                    </form>
+                </div>
             </section>
 
-            <!-- Filtros/Navegação Meses -->
-            <div class="flex flex-wrap gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide" id="month-filters">
-                <!-- Inserido via JS -->
-            </div>
-
-            <!-- Lista de Sábados -->
-            <div id="calendar-container" class="grid gap-6">
-                <div class="flex justify-center items-center py-20">
-                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-900"></div>
+            <!-- View: Calendário (Será exibida se logado) -->
+            <section id="calendar-view" class="hidden space-y-6 fade-in">
+                <div class="bg-white p-6 rounded-2xl card-shadow border border-slate-100">
+                    <h2 class="text-xl font-semibold mensa-text mb-2">Painel de Planejamento 2026</h2>
+                    <p class="text-slate-600 text-sm">Navegue pelos meses abaixo para visualizar ou propor temas para os sábados disponíveis.</p>
                 </div>
-            </div>
+
+                <!-- Filtros de Meses -->
+                <div class="flex flex-wrap gap-2 overflow-x-auto pb-2 scrollbar-hide" id="month-filters"></div>
+
+                <!-- Lista de Sábados -->
+                <div id="calendar-container" class="grid gap-6">
+                    <div class="flex flex-col items-center py-20 text-slate-400">
+                        <i class="fa-solid fa-spinner fa-spin text-3xl mb-2"></i>
+                        <p>Carregando cronograma...</p>
+                    </div>
+                </div>
+            </section>
         </main>
 
         <!-- Modal de Proposta -->
-        <div id="proposal-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-            <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
-                <div class="mensa-blue p-4 text-white flex justify-between items-center">
-                    <h3 class="font-bold">Propor Aula</h3>
-                    <button id="close-modal-btn" class="hover:bg-blue-800 p-1 rounded">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
+        <div id="proposal-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl fade-in max-h-[95vh] overflow-y-auto">
+                <div class="mensa-blue p-4 text-white flex justify-between items-center sticky top-0">
+                    <h3 class="font-bold flex items-center gap-2">
+                        <i class="fa-solid fa-calendar-plus"></i> Detalhes da Aula
+                    </h3>
+                    <button onclick="closeModal()" class="hover:bg-blue-800 p-1.5 rounded-lg transition">
+                        <i class="fa-solid fa-xmark text-xl"></i>
                     </button>
                 </div>
+                
                 <form id="proposal-form" class="p-6 space-y-4">
                     <input type="hidden" id="form-date">
                     <input type="hidden" id="form-slot">
                     
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Data e Horário</label>
-                        <div id="modal-info" class="text-sm text-blue-800 font-semibold bg-blue-50 p-2 rounded"></div>
+                    <div id="modal-info" class="text-sm font-bold bg-blue-50 text-blue-900 p-3 rounded-xl flex items-center justify-between">
+                        <span>Carregando info...</span>
+                        <span id="slot-tag" class="text-[10px] bg-blue-900 text-white px-2 py-0.5 rounded-full uppercase"></span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Professor(a)</label>
+                            <input type="text" id="prof-name" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-900 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Tema / Assunto</label>
+                            <input type="text" id="class-theme" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-900 outline-none" placeholder="Ex: Robótica">
+                        </div>
                     </div>
 
                     <div>
-                        <label for="prof-name" class="block text-sm font-medium text-slate-700 mb-1">Nome do Professor</label>
-                        <input type="text" id="prof-name" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-900 outline-none">
-                    </div>
-
-                    <div>
-                        <label for="class-theme" class="block text-sm font-medium text-slate-700 mb-1">Tema da Aula</label>
-                        <input type="text" id="class-theme" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-900 outline-none" placeholder="Ex: Astronomia, Lógica, IA...">
-                    </div>
-
-                    <div>
-                        <label for="class-status" class="block text-sm font-medium text-slate-700 mb-1">Status da Aula</label>
-                        <select id="class-status" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-900 outline-none bg-white">
-                            <option value="open">Aberto para Alterações</option>
-                            <option value="closed">Fechado para Edição</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label for="class-desc" class="block text-sm font-medium text-slate-700 mb-1">Breve Descrição</label>
-                        <textarea id="class-desc" rows="3" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-900 outline-none"></textarea>
-                    </div>
-
-                    <div>
-                        <label for="class-link" class="block text-sm font-medium text-slate-700 mb-1">Link de Acesso/Material</label>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Link de Material / Vídeo</label>
                         <input type="url" id="class-link" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-900 outline-none" placeholder="https://...">
                     </div>
 
-                    <div class="pt-2">
-                        <button type="submit" id="submit-btn" class="w-full mensa-blue text-white py-3 rounded-xl font-bold hover:opacity-90 transition-opacity">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Descrição do Conteúdo</label>
+                        <textarea id="class-desc" rows="3" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-900 outline-none"></textarea>
+                    </div>
+
+                    <div id="admin-extras" class="hidden pt-2 border-t border-dashed">
+                        <label class="block text-xs font-bold text-yellow-600 uppercase mb-1">Status (Admin Only)</label>
+                        <select id="class-status" class="w-full px-4 py-2 border rounded-lg bg-yellow-50 focus:ring-2 focus:ring-yellow-500 outline-none">
+                            <option value="open">Aberto (Editável)</option>
+                            <option value="closed">Fechado (Somente Leitura)</option>
+                        </select>
+                    </div>
+
+                    <div class="pt-4 flex gap-3">
+                        <button type="button" onclick="closeModal()" class="flex-1 bg-slate-100 text-slate-600 py-3 rounded-xl font-bold hover:bg-slate-200 transition">
+                            Cancelar
+                        </button>
+                        <button type="submit" id="submit-btn" class="flex-[2] mensa-blue text-white py-3 rounded-xl font-bold shadow-lg hover:opacity-90 transition">
                             Salvar Planejamento
                         </button>
                     </div>
@@ -116,19 +150,21 @@
             </div>
         </div>
 
-        <footer class="bg-slate-200 py-6 text-center text-sm text-slate-500">
-            &copy; 2026 Mini Mensa Brasil - Gestão Colaborativa
+        <footer class="bg-slate-200 py-6 text-center text-xs text-slate-500">
+            &copy; 2026 Mini Mensa Brasil - Gestão Colaborativa na Nuvem
         </footer>
     </div>
 
+    <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Configuração Firebase
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        // Global State & Config
+        const ADMIN_EMAIL = 'claudia@mensa.org.br';
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'mini-mensa-2026';
+        const firebaseConfig = JSON.parse(__firebase_config);
         
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -136,40 +172,56 @@
 
         let currentUser = null;
         let proposals = {};
+        let selectedMonth = new Date().getMonth();
+        if (selectedMonth < 2) selectedMonth = 2; // Começar em Março
+
+        const months = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+
+        // --- Auth Functions ---
         
-        const currentMonth = new Date().getMonth();
-        let selectedMonth = currentMonth < 2 ? 2 : currentMonth;
+        window.handleLogin = async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value.trim().toLowerCase();
+            const name = document.getElementById('login-name').value.trim();
+            
+            // Persistir localmente para o nome
+            localStorage.setItem('miniMensa_userData', JSON.stringify({ email, name }));
 
-        const calendarContainer = document.getElementById('calendar-container');
-        const authStatus = document.getElementById('auth-status');
-        const proposalModal = document.getElementById('proposal-modal');
-        const proposalForm = document.getElementById('proposal-form');
-        const monthFilters = document.getElementById('month-filters');
-        const closeModalBtn = document.getElementById('close-modal-btn');
-
-        // Inicializar Auth
-        const initAuth = async () => {
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
                     await signInAnonymously(auth);
                 }
-            } catch (error) {
-                console.error("Erro na autenticação:", error);
-                authStatus.textContent = "Erro de conexão";
+            } catch (err) {
+                console.error("Erro ao autenticar", err);
             }
         };
 
-        initAuth();
+        window.logout = () => {
+            signOut(auth);
+            localStorage.removeItem('miniMensa_userData');
+        };
 
         onAuthStateChanged(auth, (user) => {
-            if (user) {
-                currentUser = user;
-                authStatus.innerHTML = `Conectado: ${user.uid.substring(0,8)}...`;
+            const localData = JSON.parse(localStorage.getItem('miniMensa_userData'));
+            
+            if (user && localData) {
+                currentUser = { ...user, ...localData, isAdmin: localData.email === ADMIN_EMAIL };
+                document.getElementById('login-view').classList.add('hidden');
+                document.getElementById('calendar-view').classList.remove('hidden');
+                document.getElementById('user-info').classList.remove('hidden');
+                document.getElementById('user-display').textContent = currentUser.name;
                 startDataListener();
+            } else {
+                currentUser = null;
+                document.getElementById('login-view').classList.remove('hidden');
+                document.getElementById('calendar-view').classList.add('hidden');
+                document.getElementById('user-info').classList.add('hidden');
             }
         });
+
+        // --- Data Logic ---
 
         function startDataListener() {
             if (!currentUser) return;
@@ -181,14 +233,13 @@
                     proposals[doc.id] = doc.data();
                 });
                 renderCalendar();
-            }, (error) => {
-                console.error("Erro ao carregar dados:", error);
-            });
+                renderMonthFilters();
+            }, (error) => console.error("Snapshot error:", error));
         }
 
         function getAllSaturdays(year) {
             const saturdays = [];
-            let date = new Date(year, 2, 1);
+            let date = new Date(year, 2, 1); // Março
             while (date.getDay() !== 6) date.setDate(date.getDate() + 1);
             while (date.getFullYear() === year) {
                 saturdays.push(new Date(date));
@@ -198,7 +249,6 @@
         }
 
         const allSaturdays = getAllSaturdays(2026);
-        const months = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 
         window.setMonth = (m) => {
             selectedMonth = m;
@@ -207,12 +257,13 @@
         };
 
         function renderMonthFilters() {
-            monthFilters.innerHTML = months.map((month, idx) => {
+            const container = document.getElementById('month-filters');
+            container.innerHTML = months.map((month, idx) => {
                 if (idx < 2) return ''; 
                 return `
                     <button onclick="window.setMonth(${idx})" 
-                        class="px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap
-                        ${selectedMonth === idx ? 'mensa-blue text-white' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'}">
+                        class="px-5 py-2 rounded-xl text-sm font-bold transition-all whitespace-nowrap
+                        ${selectedMonth === idx ? 'mensa-blue text-white shadow-md scale-105' : 'bg-white text-slate-500 hover:bg-slate-50 border border-slate-200'}">
                         ${month}
                     </button>
                 `;
@@ -220,27 +271,27 @@
         }
 
         function renderCalendar() {
+            const container = document.getElementById('calendar-container');
             const filteredSaturdays = allSaturdays.filter(d => d.getMonth() === selectedMonth);
             
             if (filteredSaturdays.length === 0) {
-                calendarContainer.innerHTML = `<p class="text-center py-10 text-slate-400">Nenhum sábado encontrado para este mês.</p>`;
+                container.innerHTML = `<p class="text-center py-10 text-slate-400 italic">Nenhum sábado em ${months[selectedMonth]}.</p>`;
                 return;
             }
 
-            calendarContainer.innerHTML = filteredSaturdays.map(date => {
+            container.innerHTML = filteredSaturdays.map(date => {
                 const dateStr = date.toISOString().split('T')[0];
                 const day = date.getDate();
                 const monthName = months[date.getMonth()];
                 
                 return `
-                    <div class="bg-white rounded-2xl overflow-hidden card-shadow border border-slate-100">
+                    <div class="bg-white rounded-2xl overflow-hidden card-shadow border border-slate-100 fade-in">
                         <div class="bg-slate-50 px-6 py-3 border-b border-slate-100 flex justify-between items-center">
                             <span class="font-bold mensa-text text-lg">${day} de ${monthName}</span>
-                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-widest">Sábado</span>
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-white px-2 py-1 rounded-md border">Sábado</span>
                         </div>
-                        <div class="p-0">
+                        <div class="divide-y divide-slate-50">
                             ${renderSlot(dateStr, "08:00 - 09:00", 1)}
-                            <div class="border-t border-slate-50"></div>
                             ${renderSlot(dateStr, "09:00 - 10:00", 2)}
                         </div>
                     </div>
@@ -252,36 +303,36 @@
             const proposalId = `${dateStr}_${slotId}`;
             const data = proposals[proposalId];
             const isClosed = data?.status === 'closed';
+            const isAuthor = data?.updatedByEmail === currentUser?.email;
+            const canEdit = !isClosed || currentUser?.isAdmin;
 
             if (data) {
                 return `
-                    <div class="p-4 md:p-6 flex flex-col md:flex-row gap-4 items-start md:items-center hover:bg-blue-50/30 transition-colors group">
-                        <div class="${isClosed ? 'bg-red-100 text-red-900' : 'bg-blue-100 text-blue-900'} font-bold px-3 py-1 rounded text-sm w-full md:w-32 text-center">
+                    <div class="p-4 md:p-6 flex flex-col md:flex-row gap-4 items-start md:items-center hover:bg-blue-50/20 transition-colors group">
+                        <div class="${isClosed ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-900'} font-black px-3 py-1.5 rounded-lg text-xs w-full md:w-32 text-center">
                             ${timeStr}
                         </div>
                         <div class="flex-grow">
-                            <div class="flex items-center gap-2">
+                            <div class="flex items-center flex-wrap gap-2">
                                 <h4 class="font-bold text-slate-900 text-lg">${data.theme}</h4>
                                 ${isClosed ? `
-                                    <span class="flex items-center gap-1 bg-red-100 text-red-700 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
-                                        </svg>
-                                        Fechado
+                                    <span class="flex items-center gap-1 bg-amber-100 text-amber-700 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase">
+                                        <i class="fa-solid fa-lock text-[8px]"></i> Fechado
                                     </span>
                                 ` : ''}
                             </div>
-                            <p class="text-blue-700 font-medium text-sm">Prof. ${data.teacher}</p>
-                            ${data.desc ? `<p class="text-slate-500 text-sm mt-1 italic">"${data.desc}"</p>` : ''}
+                            <p class="text-blue-700 font-semibold text-sm">Prof(a). ${data.teacher}</p>
+                            ${data.desc ? `<p class="text-slate-500 text-sm mt-1 italic line-clamp-2">"${data.desc}"</p>` : ''}
                         </div>
                         <div class="flex gap-2 w-full md:w-auto">
                             ${data.link ? `
-                                <a href="${data.link}" target="_blank" class="flex-1 md:flex-none text-center bg-emerald-500 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-emerald-600">
-                                    Link
+                                <a href="${data.link}" target="_blank" class="flex-1 md:flex-none text-center bg-emerald-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-emerald-700 transition">
+                                    <i class="fa-solid fa-link"></i>
                                 </a>
                             ` : ''}
-                            <button onclick="window.openProposalModal('${dateStr}', '${slotId}', '${timeStr}')" class="flex-1 md:flex-none bg-slate-100 text-slate-600 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-slate-200">
-                                Editar
+                            <button onclick="window.openProposalModal('${dateStr}', '${slotId}', '${timeStr}')" 
+                                class="flex-1 md:flex-none ${canEdit ? 'bg-slate-100 text-slate-600 hover:bg-slate-200' : 'bg-slate-50 text-slate-300 cursor-not-allowed'} px-5 py-2 rounded-xl text-sm font-bold transition">
+                                ${canEdit ? 'Editar' : 'Ver'}
                             </button>
                         </div>
                     </div>
@@ -290,44 +341,61 @@
 
             return `
                 <div class="p-4 md:p-6 flex flex-col md:flex-row gap-4 items-center group">
-                    <div class="bg-slate-100 text-slate-400 font-bold px-3 py-1 rounded text-sm w-full md:w-32 text-center">
+                    <div class="bg-slate-100 text-slate-400 font-bold px-3 py-1.5 rounded-lg text-xs w-full md:w-32 text-center">
                         ${timeStr}
                     </div>
-                    <div class="flex-grow text-slate-400 italic text-sm text-center md:text-left">
-                        Disponível
+                    <div class="flex-grow text-slate-300 italic text-sm text-center md:text-left">
+                        Disponível para aula...
                     </div>
                     <button onclick="window.openProposalModal('${dateStr}', '${slotId}', '${timeStr}')" 
-                        class="w-full md:w-auto border-2 border-dashed border-slate-200 text-slate-400 px-6 py-2 rounded-xl text-sm font-bold hover:border-blue-900 hover:text-blue-900 transition-all">
-                        + Propor
+                        class="w-full md:w-auto border-2 border-dashed border-slate-200 text-slate-400 px-6 py-2 rounded-xl text-sm font-bold hover:border-blue-900 hover:text-blue-900 hover:bg-blue-50 transition-all">
+                        <i class="fa-solid fa-plus mr-1"></i> Propor
                     </button>
                 </div>
             `;
         }
 
+        // --- Modal & Form Interaction ---
+
         window.openProposalModal = (date, slot, time) => {
             const proposalId = `${date}_${slot}`;
             const data = proposals[proposalId] || {};
             
+            // Controle Admin
+            const adminExtras = document.getElementById('admin-extras');
+            if (currentUser.isAdmin) adminExtras.classList.remove('hidden');
+            else adminExtras.classList.add('hidden');
+
+            const isClosed = data?.status === 'closed';
+            const canEdit = !isClosed || currentUser.isAdmin;
+
+            // Preencher campos
             document.getElementById('form-date').value = date;
             document.getElementById('form-slot').value = slot;
-            document.getElementById('modal-info').textContent = `${date.split('-').reverse().join('/')} às ${time}`;
+            document.getElementById('modal-info').children[0].textContent = `${date.split('-').reverse().join('/')} às ${time}`;
+            document.getElementById('slot-tag').textContent = `${slot}º Horário`;
             
-            document.getElementById('prof-name').value = data.teacher || '';
+            document.getElementById('prof-name').value = data.teacher || currentUser.name;
             document.getElementById('class-theme').value = data.theme || '';
             document.getElementById('class-status').value = data.status || 'open';
             document.getElementById('class-desc').value = data.desc || '';
             document.getElementById('class-link').value = data.link || '';
             
-            proposalModal.classList.remove('hidden');
+            // Habilitar/Desabilitar botões
+            document.getElementById('submit-btn').style.display = canEdit ? 'block' : 'none';
+            document.getElementById('proposal-form').querySelectorAll('input, textarea').forEach(el => {
+                el.disabled = !canEdit;
+                el.classList.toggle('bg-slate-50', !canEdit);
+            });
+
+            document.getElementById('proposal-modal').classList.remove('hidden');
         };
 
         window.closeModal = () => {
-            proposalModal.classList.add('hidden');
+            document.getElementById('proposal-modal').classList.add('hidden');
         };
 
-        closeModalBtn.onclick = closeModal;
-
-        proposalForm.onsubmit = async (e) => {
+        document.getElementById('proposal-form').onsubmit = async (e) => {
             e.preventDefault();
             if (!currentUser) return;
 
@@ -342,12 +410,13 @@
                 desc: document.getElementById('class-desc').value,
                 link: document.getElementById('class-link').value,
                 updatedAt: new Date().toISOString(),
-                updatedBy: currentUser.uid
+                updatedBy: currentUser.uid,
+                updatedByEmail: currentUser.email
             };
 
             const submitBtn = document.getElementById('submit-btn');
             submitBtn.disabled = true;
-            submitBtn.textContent = "Salvando...";
+            submitBtn.textContent = "Gravando...";
 
             try {
                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'proposals', proposalId);
@@ -361,10 +430,12 @@
             }
         };
 
+        // Fechar no overlay
         window.onclick = (event) => {
-            if (event.target == proposalModal) closeModal();
+            if (event.target == document.getElementById('proposal-modal')) closeModal();
         };
 
+        // Init
         renderMonthFilters();
         renderCalendar();
     </script>
