@@ -12,8 +12,6 @@
         .mensa-blue { background-color: #002147; }
         .mensa-text { color: #002147; }
         .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
-        .scrollbar-hide::-webkit-scrollbar { display: none; }
-        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         .fade-in { animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
@@ -25,18 +23,21 @@
         <header class="mensa-blue text-white py-4 px-4 shadow-lg sticky top-0 z-40">
             <div class="max-w-6xl mx-auto flex justify-between items-center">
                 <div class="flex items-center gap-3">
-                    <div class="bg-white p-1.5 rounded-lg">
-                        <i class="fa-solid fa-brain text-blue-900 text-xl"></i>
+                    <div class="bg-white p-1 rounded-lg flex items-center justify-center overflow-hidden w-10 h-10 shadow-inner">
+                        <img src="https://encrypted-tbn0.gstatic.com/faviconV2?url=https://mensa.org.br&client=AIM&size=128&type=FAVICON&fallback_opts=TYPE,SIZE,URL" 
+                             alt="Mensa Logo" 
+                             class="w-full h-full object-contain"
+                             onerror="this.src='https://via.placeholder.com/40?text=M'">
                     </div>
                     <div>
                         <h1 class="text-lg font-bold leading-none">Mini Mensa Brasil</h1>
-                        <p class="text-blue-200 text-[10px] uppercase tracking-tighter">Cronograma Educacional 2026</p>
+                        <p class="text-blue-200 text-[10px] uppercase tracking-tighter">Planejamento Anual 2026</p>
                     </div>
                 </div>
                 <div id="user-info" class="hidden flex items-center gap-3">
                     <div class="flex flex-col items-end">
                         <span id="user-display" class="text-xs font-bold leading-none"></span>
-                        <span id="connection-status" class="text-[9px] text-blue-300 uppercase italic">Conectando...</span>
+                        <span id="connection-status" class="text-[9px] text-blue-300 uppercase italic">Online</span>
                     </div>
                     <button onclick="logout()" class="text-xs bg-blue-800 hover:bg-red-700 px-3 py-1 rounded-md transition">
                         <i class="fa-solid fa-right-from-bracket"></i>
@@ -46,21 +47,32 @@
         </header>
 
         <main id="main-content" class="flex-grow max-w-6xl w-full mx-auto p-4 md:p-8">
-            <!-- View: Login -->
+            <!-- View: Login Manual (Evita erro de domínio do Google) -->
             <section id="login-view" class="py-10">
-                <div class="max-w-md mx-auto bg-white rounded-2xl shadow-xl p-8 fade-in text-center">
-                    <div class="mb-8">
+                <div class="max-w-md mx-auto bg-white rounded-2xl shadow-xl p-8 fade-in">
+                    <div class="text-center mb-8">
                         <h2 class="text-2xl font-bold mensa-text">Acesso ao Planejamento</h2>
-                        <p class="text-slate-500 text-sm mt-2">Utilize o seu e-mail institucional @mensa.org.br</p>
+                        <p class="text-slate-500 text-sm mt-2">Identifique-se para visualizar ou editar</p>
                     </div>
                     
-                    <button onclick="handleGoogleLogin()" id="login-btn" class="w-full flex items-center justify-center gap-3 bg-white border border-slate-300 text-slate-700 py-3 px-4 rounded-xl font-semibold shadow-sm hover:bg-slate-50 transition mb-4">
-                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5">
-                        <span>Entrar com Google</span>
-                    </button>
+                    <form onsubmit="handleManualLogin(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">E-mail</label>
+                            <input type="email" id="email-input" required placeholder="seuemail@mensa.org.br" 
+                                class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-900 outline-none transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nome</label>
+                            <input type="text" id="name-input" required placeholder="Como prefere ser chamado" 
+                                class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-900 outline-none transition">
+                        </div>
+                        <button type="submit" class="w-full mensa-blue text-white py-3 rounded-xl font-bold shadow-lg hover:opacity-90 transition">
+                            Entrar no Sistema
+                        </button>
+                    </form>
                     
-                    <p class="text-[10px] text-slate-400 uppercase tracking-widest leading-tight">
-                        Acesso restrito a Cláudia (Escrita) <br> e Membros Mensa (Leitura)
+                    <p class="text-[10px] text-slate-400 uppercase tracking-widest leading-tight mt-6 text-center">
+                        Acesso total: Cláudia <br> Somente Leitura: Membros Mensa
                     </p>
                 </div>
             </section>
@@ -70,25 +82,16 @@
                 <div class="bg-white p-6 rounded-2xl card-shadow border border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
                         <h2 class="text-xl font-semibold mensa-text mb-1">Painel de Planejamento 2026</h2>
-                        <p class="text-slate-500 text-sm">Organize os temas das aulas para os sábados letivos.</p>
-                    </div>
-                    <div id="status-badge" class="bg-amber-50 text-amber-700 text-[10px] font-bold px-3 py-1 rounded-full border border-amber-100 uppercase tracking-wider animate-pulse">
-                        Verificando Nuvem
+                        <p class="text-slate-500 text-sm">Aulas dos sábados letivos.</p>
                     </div>
                 </div>
 
-                <div class="flex flex-wrap gap-2 overflow-x-auto pb-2 scrollbar-hide" id="month-filters"></div>
-
-                <div id="calendar-container" class="grid gap-6">
-                    <div class="flex flex-col items-center py-20 text-slate-400">
-                        <i class="fa-solid fa-spinner fa-spin text-3xl mb-2"></i>
-                        <p>Carregando cronograma...</p>
-                    </div>
-                </div>
+                <div class="flex flex-wrap gap-2 overflow-x-auto pb-2" id="month-filters"></div>
+                <div id="calendar-container" class="grid gap-6"></div>
             </section>
         </main>
 
-        <!-- Modal de Planejamento -->
+        <!-- Modal -->
         <div id="proposal-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
             <div class="bg-white rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl fade-in max-h-[95vh] overflow-y-auto">
                 <div class="mensa-blue p-4 text-white flex justify-between items-center sticky top-0">
@@ -104,13 +107,12 @@
                     <input type="hidden" id="form-date">
                     <input type="hidden" id="form-slot">
                     
-                    <div id="modal-info" class="text-xs md:text-sm font-bold bg-blue-50 text-blue-900 p-3 rounded-xl flex items-center justify-between">
+                    <div id="modal-info" class="text-xs md:text-sm font-bold bg-blue-50 text-blue-900 p-3 rounded-xl">
                         <span>Carregando...</span>
-                        <span id="slot-tag" class="text-[10px] bg-blue-900 text-white px-2 py-0.5 rounded-full uppercase"></span>
                     </div>
 
                     <div id="read-only-warning" class="hidden bg-red-50 text-red-700 p-3 rounded-xl text-xs font-bold border border-red-100">
-                        Apenas Cláudia pode salvar alterações no cronograma.
+                        Apenas a Cláudia pode guardar alterações oficiais.
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -125,17 +127,12 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Link de Material / Referência</label>
-                        <input type="url" id="class-link" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-900 outline-none text-sm" placeholder="https://...">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Resumo da Atividade</label>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Resumo / Notas</label>
                         <textarea id="class-desc" rows="3" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-900 outline-none text-sm"></textarea>
                     </div>
 
-                    <div id="admin-extras" class="hidden pt-2 border-t border-dashed">
-                        <label class="block text-xs font-bold text-yellow-600 uppercase mb-1">Controle (Admin)</label>
+                    <div id="admin-extras" class="hidden">
+                        <label class="block text-xs font-bold text-yellow-600 uppercase mb-1">Status (Admin)</label>
                         <select id="class-status" class="w-full px-4 py-2 border rounded-lg bg-yellow-50 focus:ring-2 focus:ring-yellow-500 outline-none text-sm">
                             <option value="open">Aberto para Edição</option>
                             <option value="closed">Fechado / Confirmado</option>
@@ -144,7 +141,7 @@
 
                     <div class="pt-4 flex gap-3">
                         <button type="button" onclick="closeModal()" class="flex-1 bg-slate-100 text-slate-600 py-3 rounded-xl font-bold hover:bg-slate-200 transition text-sm">Fechar</button>
-                        <button type="submit" id="submit-btn" class="flex-[2] mensa-blue text-white py-3 rounded-xl font-bold shadow-lg hover:opacity-90 transition text-sm">Salvar Alterações</button>
+                        <button type="submit" id="submit-btn" class="flex-[2] mensa-blue text-white py-3 rounded-xl font-bold shadow-lg hover:opacity-90 transition text-sm">Guardar Alterações</button>
                     </div>
                 </form>
             </div>
@@ -157,105 +154,76 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyDspUhih_WIqNa7I6qmteUT-eu5PXo0clA",
-            authDomain: "minimensa2026.firebaseapp.com",
-            projectId: "minimensa2026",
-            storageBucket: "minimensa2026.firebasestorage.app",
-            messagingSenderId: "920097363105",
-            appId: "1:920097363105:web:6f45eb6231a6ff3b850ce0",
-            measurementId: "G-MBEQDLSN5Q"
-        };
-
-        const appId = 'mini-mensa-2026';
-        let app, auth, db, currentUser = null, proposals = {}, selectedMonth = new Date().getMonth();
-        let isCloudActive = false;
-        if (selectedMonth < 2) selectedMonth = 2;
+        // Configurações
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'mini-mensa-2026';
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        let currentUser = null;
+        let proposals = {};
+        let selectedMonth = 2; // Março
 
         const months = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 
-        // Inicializar Firebase
-        try {
-            app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            db = getFirestore(app);
-            isCloudActive = true;
-            
-            // Listener de estado de autenticação (Online Automático)
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    const email = user.email.toLowerCase();
-                    const domain = email.split('@')[1];
-                    
-                    // Permissão: Cláudia grava tudo, outros @mensa.org.br apenas vêem
-                    if (email === 'claudia@mensa.org.br' || domain === 'mensa.org.br') {
-                        enterApp({
-                            name: user.displayName || user.email,
-                            email: email,
-                            canEdit: email === 'claudia@mensa.org.br'
-                        });
-                    } else {
-                        signOut(auth);
-                        alert("Acesso negado. Utilize um e-mail @mensa.org.br");
-                    }
-                } else {
-                    document.getElementById('login-view').classList.remove('hidden');
-                    document.getElementById('calendar-view').classList.add('hidden');
-                    document.getElementById('user-info').classList.add('hidden');
-                }
-            });
-
-        } catch (e) {
-            console.error("Erro na inicialização:", e);
-        }
-
-        window.handleGoogleLogin = async () => {
-            const provider = new GoogleAuthProvider();
+        // Inicialização com Auth Anónimo (Evita erro de domínio)
+        const startApp = async () => {
             try {
-                await signInWithPopup(auth, provider);
+                await signInAnonymously(auth);
             } catch (err) {
-                console.error("Erro no login Google:", err);
-                alert("Erro ao conectar com Google. Tente novamente.");
+                console.error("Erro na ligação anónima:", err);
             }
         };
 
-        function enterApp(data) {
-            currentUser = data;
+        startApp();
+
+        onAuthStateChanged(auth, (user) => {
+            const savedUser = localStorage.getItem('miniMensa_userProfile');
+            if (user && savedUser) {
+                const profile = JSON.parse(savedUser);
+                currentUser = {
+                    ...profile,
+                    uid: user.uid,
+                    canEdit: profile.email.toLowerCase() === 'claudia@mensa.org.br'
+                };
+                enterApp();
+            }
+        });
+
+        window.handleManualLogin = (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email-input').value.trim();
+            const name = document.getElementById('name-input').value.trim();
+            
+            const profile = { email, name };
+            localStorage.setItem('miniMensa_userProfile', JSON.stringify(profile));
+            
+            // Força o trigger do state change
+            window.location.reload();
+        };
+
+        function enterApp() {
             document.getElementById('login-view').classList.add('hidden');
             document.getElementById('calendar-view').classList.remove('hidden');
             document.getElementById('user-info').classList.remove('hidden');
             document.getElementById('user-display').textContent = currentUser.name.split(' ')[0];
             
-            updateStatusLabel();
             renderMonthFilters();
-            renderCalendar();
-            
-            if (isCloudActive) startDataListener();
-        }
-
-        function updateStatusLabel() {
-            const label = isCloudActive ? 'Nuvem Conectada' : 'Modo Offline';
-            document.getElementById('connection-status').textContent = label;
-            const badge = document.getElementById('status-badge');
-            badge.textContent = label;
-            badge.classList.remove('animate-pulse');
-            if (isCloudActive) {
-                badge.className = "bg-green-50 text-green-700 text-[10px] font-bold px-3 py-1 rounded-full border border-green-100 uppercase tracking-wider";
-            }
+            startDataListener();
         }
 
         function startDataListener() {
-            if (!db) return;
+            if (!auth.currentUser) return;
             const proposalsRef = collection(db, 'artifacts', appId, 'public', 'data', 'proposals');
             onSnapshot(proposalsRef, (snapshot) => {
                 snapshot.forEach(doc => { proposals[doc.id] = doc.data(); });
                 renderCalendar();
-            }, (err) => {
-                console.error("Erro no Firestore Listener:", err);
-            });
+            }, (err) => console.error("Erro no Firestore:", err));
         }
 
         const allSaturdays = (() => {
@@ -269,11 +237,7 @@
             return sats;
         })();
 
-        window.setMonth = (m) => {
-            selectedMonth = m;
-            renderMonthFilters();
-            renderCalendar();
-        };
+        window.setMonth = (m) => { selectedMonth = m; renderMonthFilters(); renderCalendar(); };
 
         function renderMonthFilters() {
             const container = document.getElementById('month-filters');
@@ -289,10 +253,13 @@
             container.innerHTML = filtered.map(date => {
                 const dateStr = date.toISOString().split('T')[0];
                 return `<div class="bg-white rounded-2xl overflow-hidden card-shadow border border-slate-100 fade-in">
-                    <div class="bg-slate-50 px-6 py-3 border-b border-slate-100 flex justify-between items-center">
+                    <div class="bg-slate-50 px-6 py-3 border-b border-slate-100">
                         <span class="font-bold mensa-text text-base">${date.getDate()} de ${months[date.getMonth()]}</span>
                     </div>
-                    <div class="divide-y divide-slate-50">${renderSlot(dateStr, "08:00 - 09:00", 1)}${renderSlot(dateStr, "09:00 - 10:00", 2)}</div>
+                    <div class="divide-y divide-slate-50">
+                        ${renderSlot(dateStr, "08:00 - 09:00", 1)}
+                        ${renderSlot(dateStr, "09:00 - 10:00", 2)}
+                    </div>
                 </div>`;
             }).join('');
         }
@@ -301,19 +268,14 @@
             const id = `${dateStr}_${slotId}`;
             const data = proposals[id];
             const isClosed = data && data.status === 'closed';
-            const actionLabel = currentUser.canEdit ? (data ? 'Editar' : 'Agendar') : 'Ver Detalhes';
+            const actionLabel = currentUser.canEdit ? (data ? 'Editar' : 'Planear') : 'Ver';
             
-            if (data) {
-                return `<div class="p-4 flex flex-col md:flex-row gap-3 items-center">
-                    <div class="${isClosed ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-900'} font-black px-3 py-1 rounded-lg text-[10px] w-full md:w-28 text-center">${timeStr}</div>
-                    <div class="flex-grow text-center md:text-left"><h4 class="font-bold text-slate-900 text-sm">${data.theme}</h4><p class="text-blue-700 text-xs">${data.teacher}</p></div>
-                    <button onclick="window.openProposalModal('${dateStr}', '${slotId}', '${timeStr}')" class="bg-slate-100 text-slate-600 px-4 py-1.5 rounded-lg text-xs font-bold">${actionLabel}</button>
-                </div>`;
-            }
             return `<div class="p-4 flex flex-col md:flex-row gap-3 items-center">
-                <div class="bg-slate-100 text-slate-400 font-bold px-3 py-1 rounded-lg text-[10px] w-full md:w-28 text-center">${timeStr}</div>
-                <div class="flex-grow text-slate-300 italic text-xs">Vago...</div>
-                <button onclick="window.openProposalModal('${dateStr}', '${slotId}', '${timeStr}')" class="border border-dashed border-slate-200 text-slate-400 px-4 py-1.5 rounded-lg text-xs font-bold">${actionLabel}</button>
+                <div class="${data ? (isClosed ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-900') : 'bg-slate-100 text-slate-400'} font-black px-3 py-1 rounded-lg text-[10px] w-full md:w-28 text-center">${timeStr}</div>
+                <div class="flex-grow text-center md:text-left">
+                    ${data ? `<h4 class="font-bold text-slate-900 text-sm">${data.theme}</h4><p class="text-blue-700 text-xs">${data.teacher}</p>` : `<span class="text-slate-300 italic text-xs">Vago...</span>`}
+                </div>
+                <button onclick="window.openProposalModal('${dateStr}', '${slotId}', '${timeStr}')" class="bg-slate-100 text-slate-600 px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-200 transition">${actionLabel}</button>
             </div>`;
         }
 
@@ -326,18 +288,13 @@
             document.getElementById('prof-name').value = data.teacher || (currentUser.canEdit ? currentUser.name : '');
             document.getElementById('class-theme').value = data.theme || '';
             document.getElementById('class-desc').value = data.desc || '';
-            document.getElementById('class-link').value = data.link || '';
             document.getElementById('class-status').value = data.status || 'open';
             
-            // Controle de permissão na UI do modal
-            const inputs = ['prof-name', 'class-theme', 'class-desc', 'class-link', 'class-status'];
+            const inputs = ['prof-name', 'class-theme', 'class-desc', 'class-status'];
             inputs.forEach(id => document.getElementById(id).disabled = !currentUser.canEdit);
-            
-            const submitBtn = document.getElementById('submit-btn');
-            submitBtn.style.display = currentUser.canEdit ? 'block' : 'none';
+            document.getElementById('submit-btn').classList.toggle('hidden', !currentUser.canEdit);
             document.getElementById('read-only-warning').classList.toggle('hidden', currentUser.canEdit);
             document.getElementById('admin-extras').classList.toggle('hidden', !currentUser.canEdit);
-
             document.getElementById('proposal-modal').classList.remove('hidden');
         };
 
@@ -345,29 +302,28 @@
 
         document.getElementById('proposal-form').onsubmit = async (e) => {
             e.preventDefault();
-            if (!currentUser.canEdit) return;
-            if (!isCloudActive) return alert("Erro: Firebase não configurado.");
-            
+            if (!currentUser || !currentUser.canEdit) return;
             const date = document.getElementById('form-date').value;
             const slot = document.getElementById('form-slot').value;
-            const payload = {
-                teacher: document.getElementById('prof-name').value,
-                theme: document.getElementById('class-theme').value,
-                desc: document.getElementById('class-desc').value,
-                link: document.getElementById('class-link').value,
-                status: document.getElementById('class-status').value,
-                updatedAt: new Date().toISOString()
-            };
+            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'proposals', `${date}_${slot}`);
+            
             try {
-                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'proposals', `${date}_${slot}`), payload);
+                await setDoc(docRef, {
+                    teacher: document.getElementById('prof-name').value,
+                    theme: document.getElementById('class-theme').value,
+                    desc: document.getElementById('class-desc').value,
+                    status: document.getElementById('class-status').value,
+                    updatedAt: new Date().toISOString()
+                });
                 closeModal();
-            } catch (err) {
-                console.error(err);
-                alert("Erro ao salvar: " + err.message);
-            }
+            } catch (err) { console.error("Erro ao guardar:", err); }
         };
 
-        window.logout = () => { if (auth) signOut(auth); localStorage.clear(); window.location.reload(); };
+        window.logout = async () => { 
+            localStorage.removeItem('miniMensa_userProfile');
+            await signOut(auth); 
+            window.location.reload(); 
+        };
     </script>
 </body>
 </html>
