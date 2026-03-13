@@ -15,7 +15,12 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-        body { font-family: 'Inter', sans-serif; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            margin: 0;
+            padding: 0;
+        }
+        #root { min-height: 100vh; }
     </style>
 </head>
 <body>
@@ -24,7 +29,7 @@
     <script type="text/babel">
         const { useState, useEffect } = React;
 
-        // Mock das funções do Lucide para uso via CDN
+        // Componente de ícone robusto para ambiente CDN
         const Icon = ({ name, size = 24, className = "" }) => {
             useEffect(() => {
                 if (window.lucide) {
@@ -185,7 +190,7 @@
                             <div className="flex-1">
                                 <h3 className="text-2xl font-bold mb-3 text-green-900 uppercase tracking-tighter">Horários de Preparatórios</h3>
                                 <p className="text-gray-600 text-lg leading-relaxed">
-                                    Nos dias de aula, os preparatórios decorrem das <span className="font-bold text-green-700 bg-green-50 px-2 py-1 rounded">10:30 às 12:00 (Manhã)</span> e <span className="font-bold text-green-700 bg-green-50 px-2 py-1 rounded">no período da tarde aos sábados</span>.
+                                    Nos dias de aula, os preparatórios ocorrem das <span className="font-bold text-green-700 bg-green-50 px-2 py-1 rounded">10:30 às 12:00 (Manhã)</span> e <span className="font-bold text-green-700 bg-green-50 px-2 py-1 rounded">no período da tarde aos sábados</span>.
                                 </p>
                             </div>
                         </section>
@@ -210,8 +215,14 @@
             );
         }
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+        // Garante que o DOM esteja carregado antes de renderizar
+        window.addEventListener('load', () => {
+            const container = document.getElementById('root');
+            if (container) {
+                const root = ReactDOM.createRoot(container);
+                root.render(<App />);
+            }
+        });
     </script>
 </body>
 </html>
