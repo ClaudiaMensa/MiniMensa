@@ -1,329 +1,363 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planejamento Mini Mensa 2026</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
-        .mensa-blue { background-color: #002147; }
-        .mensa-text { color: #002147; }
-        .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
-        .fade-in { animation: fadeIn 0.3s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    </style>
-</head>
-<body class="text-slate-800">
+import React, { useState } from 'react';
+import { 
+  Calendar, 
+  Brain, 
+  Rocket, 
+  Palette, 
+  Bot, 
+  TestTube, 
+  Star, 
+  Trophy, 
+  Clock, 
+  GraduationCap,
+  ChevronDown,
+  ChevronUp,
+  ShieldCheck,
+  Globe
+} from 'lucide-react';
 
-    <div id="app" class="min-h-screen flex flex-col">
-        <!-- Header -->
-        <header class="mensa-blue text-white py-4 px-4 shadow-lg sticky top-0 z-40">
-            <div class="max-w-6xl mx-auto flex justify-between items-center">
-                <div class="flex items-center gap-3">
-                    <div class="bg-white p-1 rounded-lg flex items-center justify-center overflow-hidden w-10 h-10 shadow-inner">
-                        <img src="https://encrypted-tbn0.gstatic.com/faviconV2?url=https://mensa.org.br&client=AIM&size=128&type=FAVICON&fallback_opts=TYPE,SIZE,URL" 
-                             alt="Mensa Logo" 
-                             class="w-full h-full object-contain"
-                             onerror="this.src='https://via.placeholder.com/40?text=M'">
-                    </div>
-                    <div>
-                        <h1 class="text-lg font-bold leading-none">Mini Mensa Brasil</h1>
-                        <p class="text-blue-200 text-[10px] uppercase tracking-tighter">Planejamento Anual 2026</p>
-                    </div>
-                </div>
-                <div id="user-info" class="hidden flex items-center gap-3">
-                    <div class="flex flex-col items-end">
-                        <span id="user-display" class="text-xs font-bold leading-none"></span>
-                        <span id="connection-status" class="text-[9px] text-blue-300 uppercase italic">Online</span>
-                    </div>
-                    <button onclick="logout()" class="text-xs bg-blue-800 hover:bg-red-700 px-3 py-1 rounded-md transition">
-                        <i class="fa-solid fa-right-from-bracket"></i>
-                    </button>
-                </div>
+// Dados da programação atualizados
+const scheduleData = [
+  { 
+    id: 1, 
+    date: "14/03", 
+    title: "Aula Inaugural", 
+    description: "Abertura do semestre com Ivana Rebelo e Claudia Aguiar. Horário especial: das 09:00 às 10:00.", 
+    type: "special",
+    icon: Star
+  },
+  { 
+    id: 2, 
+    date: "21/03", 
+    title: "Robótica & Olimpíadas", 
+    description: "08:30 - 10:30: Robótica com Prof. Rafael Truli Gomes (Poli USP). 10:30 - 12:00: Preparatório Olímpico com Claudia Aguiar. Tarde (14:00 - 16:00): Foguetes, OBMEP e Caça Asteroides.", 
+    type: "robotics",
+    icon: Bot
+  },
+  { 
+    id: 3, 
+    date: "28/03", 
+    title: "Projeto Quasar", 
+    description: "Coordenação de Claudia Aguiar. Aulas com Isabela Bicalho (Projeto Quasar) e com o Astronauta Análogo Francesco.", 
+    type: "science",
+    icon: Rocket
+  },
+  { 
+    id: 4, 
+    date: "04/04", 
+    title: "Oficina de Páscoa", 
+    description: "Oficina especial de criação de Ovos de Páscoa.", 
+    type: "art",
+    icon: Palette
+  },
+  { 
+    id: 5, 
+    date: "11/04", 
+    title: "Robótica com Prof. Rafael Truli", 
+    description: "Aula prática de robótica e programação.", 
+    type: "robotics",
+    icon: Bot
+  },
+  { 
+    id: 6, 
+    date: "18/04", 
+    title: "Desenho e Artes Plásticas", 
+    description: "Aulas de desenho e artes plásticas explorando a criatividade.", 
+    type: "art",
+    icon: Palette
+  },
+  { 
+    id: 7, 
+    date: "25/04", 
+    title: "Física", 
+    description: "Aulas de física avançada e experimental com o professor Bruno.", 
+    type: "science",
+    icon: TestTube
+  },
+  { 
+    id: 8, 
+    date: "02/05", 
+    title: "Robótica", 
+    description: "Aprofundamento em projetos de robótica.", 
+    type: "robotics",
+    icon: Bot
+  },
+  { 
+    id: 9, 
+    date: "09/05", 
+    title: "Desenho", 
+    description: "Técnicas avançadas de desenho.", 
+    type: "art",
+    icon: Palette
+  },
+  { 
+    id: 10, 
+    date: "16/05", 
+    title: "Biologia e Genética", 
+    description: "Exploração do mundo da biologia e os segredos da genética.", 
+    type: "science",
+    icon: TestTube
+  },
+  { 
+    id: 11, 
+    date: "23/05", 
+    title: "Robótica", 
+    description: "Aula de robótica com o Prof. Rafael Truli Gomes.", 
+    type: "robotics",
+    icon: Bot
+  },
+  { 
+    id: 12, 
+    date: "30/05", 
+    title: "Artes e Desenho", 
+    description: "Expressão artística e desenvolvimento criativo.", 
+    type: "art",
+    icon: Palette
+  },
+  { 
+    id: 13, 
+    date: "04/06", 
+    title: "Engenhocas e Mecânica", 
+    description: "Aula de engenhocas focada em desafios de física e mecânica aplicada com a Profa. Claudia Aguiar.", 
+    type: "science",
+    icon: Brain
+  },
+  { 
+    id: 14, 
+    date: "11/06", 
+    title: "Robótica", 
+    description: "Desenvolvimento final de projetos com o Prof. Rafael.", 
+    type: "robotics",
+    icon: Bot
+  },
+  { 
+    id: 15, 
+    date: "18/06", 
+    title: "Desenho", 
+    description: "Finalização dos portfólios de artes e desenho.", 
+    type: "art",
+    icon: Palette
+  },
+  { 
+    id: 16, 
+    date: "25/06", 
+    title: "Encerramento do Semestre", 
+    description: "Aula especial de confraternização e encerramento das atividades do semestre.", 
+    type: "special",
+    icon: GraduationCap
+  }
+];
+
+const EventCard = ({ event, isLeft }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const Icon = event.icon;
+  
+  return (
+    <div className={`mb-10 flex justify-between items-center w-full ${isLeft ? 'flex-row-reverse' : ''}`}>
+      <div className="hidden md:block w-5/12"></div>
+      
+      <div className="z-20 relative">
+        <div className="flex items-center justify-center w-10 h-10 rounded-full bg-green-700 text-white shadow-md border-2 border-white">
+          <Icon size={18} />
+        </div>
+      </div>
+      
+      <div className="w-full md:w-5/12 pl-6 md:pl-0">
+        <div 
+          className="bg-white p-5 rounded-lg shadow-sm border border-gray-100 hover:border-green-200 transition-all cursor-pointer"
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-[10px] font-black tracking-widest text-green-700 uppercase bg-green-50 px-2 py-1 rounded">
+              {event.date}
+            </span>
+            <div className="text-gray-300">
+              {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
             </div>
-        </header>
+          </div>
+          
+          <h3 className="text-lg font-bold text-gray-800 mb-1 leading-tight">
+            {event.title}
+          </h3>
+          
+          <div className={`text-gray-600 text-sm leading-relaxed transition-all duration-300 ${isExpanded ? 'max-h-40 mt-3 opacity-100' : 'max-h-0 md:max-h-20 overflow-hidden'}`}>
+            <p>{event.description}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
-        <main id="main-content" class="flex-grow max-w-6xl w-full mx-auto p-4 md:p-8">
-            <!-- View: Login Manual (Evita erro de domínio do Google) -->
-            <section id="login-view" class="py-10">
-                <div class="max-w-md mx-auto bg-white rounded-2xl shadow-xl p-8 fade-in">
-                    <div class="text-center mb-8">
-                        <h2 class="text-2xl font-bold mensa-text">Acesso ao Planejamento</h2>
-                        <p class="text-slate-500 text-sm mt-2">Identifique-se para visualizar ou editar</p>
-                    </div>
-                    
-                    <form onsubmit="handleManualLogin(event)" class="space-y-4">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">E-mail</label>
-                            <input type="email" id="email-input" required placeholder="seuemail@mensa.org.br" 
-                                class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-900 outline-none transition">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nome</label>
-                            <input type="text" id="name-input" required placeholder="Como prefere ser chamado" 
-                                class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-900 outline-none transition">
-                        </div>
-                        <button type="submit" class="w-full mensa-blue text-white py-3 rounded-xl font-bold shadow-lg hover:opacity-90 transition">
-                            Entrar no Sistema
-                        </button>
-                    </form>
-                    
-                    <p class="text-[10px] text-slate-400 uppercase tracking-widest leading-tight mt-6 text-center">
-                        Acesso total: Cláudia <br> Somente Leitura: Membros Mensa
-                    </p>
-                </div>
-            </section>
+export default function App() {
+  return (
+    <div className="min-h-screen bg-[#f4f7f4] font-sans text-gray-900 selection:bg-green-100">
+      {/* Top Banner Estilo Mensa */}
+      <div className="bg-[#004a2f] text-white text-[10px] py-1.5 px-6 font-bold tracking-[0.2em] uppercase flex justify-between items-center">
+        <span>Mensa Brasil - A Sociedade de Alto QI</span>
+        <div className="flex gap-4">
+          <span className="opacity-70">Internacional</span>
+        </div>
+      </div>
 
-            <!-- View: Calendário -->
-            <section id="calendar-view" class="hidden space-y-6 fade-in">
-                <div class="bg-white p-6 rounded-2xl card-shadow border border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                    <div>
-                        <h2 class="text-xl font-semibold mensa-text mb-1">Painel de Planejamento 2026</h2>
-                        <p class="text-slate-500 text-sm">Aulas dos sábados letivos.</p>
-                    </div>
-                </div>
+      {/* Navbar Principal */}
+      <nav className="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center sticky top-0 z-50">
+        <div className="flex items-center gap-3">
+          <div className="bg-green-700 p-2 rounded-lg">
+             <Globe size={24} className="text-white" />
+          </div>
+          <div>
+            <h1 className="font-bold text-xl leading-none text-green-900 tracking-tighter">MENSA</h1>
+            <span className="text-[10px] font-bold text-gray-400 tracking-[0.3em] uppercase">Brasil</span>
+          </div>
+        </div>
+        <div className="flex gap-8 text-[11px] font-bold uppercase tracking-widest text-gray-600">
+          <a href="#" className="text-green-700 border-b-2 border-green-700 pb-1">Planejamento</a>
+          <a href="#" className="hover:text-green-700 transition-colors hidden sm:block">Programas Educacionais</a>
+          <a href="#" className="hover:text-green-700 transition-colors hidden md:block">Apoio ao Superdotado</a>
+        </div>
+        <div className="w-10 md:hidden"></div>
+      </nav>
 
-                <div class="flex flex-wrap gap-2 overflow-x-auto pb-2" id="month-filters"></div>
-                <div id="calendar-container" class="grid gap-6"></div>
-            </section>
-        </main>
+      {/* Header com estilo verde institucional */}
+      <header className="relative bg-[#004a2f] py-20 px-6 overflow-hidden">
+        <div className="absolute top-0 right-0 w-1/3 h-full opacity-10 pointer-events-none">
+          <Brain size={400} className="text-white -mr-20 -mt-20" />
+        </div>
+        
+        <div className="max-w-4xl mx-auto relative z-10">
+          <div className="mb-6 flex items-center gap-2">
+            <ShieldCheck size={20} className="text-green-400" />
+            <span className="text-green-300 text-xs font-bold uppercase tracking-[0.2em]">Programa de Enriquecimento</span>
+          </div>
+          <h2 className="text-4xl md:text-6xl font-extrabold text-white mb-6 leading-none">
+            Planejamento Semestral <br />
+            <span className="text-green-400">Mini Mensa 2024</span>
+          </h2>
+          <p className="text-lg md:text-xl text-green-50/80 font-medium max-w-2xl leading-relaxed">
+            Desenvolvendo o potencial de Jovens Brilhantes através de atividades integrativas de alta performance cognitiva.
+          </p>
+        </div>
+      </header>
 
-        <!-- Modal -->
-        <div id="proposal-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-            <div class="bg-white rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl fade-in max-h-[95vh] overflow-y-auto">
-                <div class="mensa-blue p-4 text-white flex justify-between items-center sticky top-0">
-                    <h3 class="font-bold flex items-center gap-2 text-sm md:text-base">
-                        <i class="fa-solid fa-calendar-plus"></i> Detalhes da Aula
-                    </h3>
-                    <button onclick="closeModal()" class="hover:bg-blue-800 p-1.5 rounded-lg transition">
-                        <i class="fa-solid fa-xmark text-xl"></i>
-                    </button>
-                </div>
-                
-                <form id="proposal-form" class="p-6 space-y-4">
-                    <input type="hidden" id="form-date">
-                    <input type="hidden" id="form-slot">
-                    
-                    <div id="modal-info" class="text-xs md:text-sm font-bold bg-blue-50 text-blue-900 p-3 rounded-xl">
-                        <span>Carregando...</span>
-                    </div>
-
-                    <div id="read-only-warning" class="hidden bg-red-50 text-red-700 p-3 rounded-xl text-xs font-bold border border-red-100">
-                        Apenas a Cláudia pode guardar alterações oficiais.
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Responsável</label>
-                            <input type="text" id="prof-name" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-900 outline-none text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Tema Principal</label>
-                            <input type="text" id="class-theme" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-900 outline-none text-sm">
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Resumo / Notas</label>
-                        <textarea id="class-desc" rows="3" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-900 outline-none text-sm"></textarea>
-                    </div>
-
-                    <div id="admin-extras" class="hidden">
-                        <label class="block text-xs font-bold text-yellow-600 uppercase mb-1">Status (Admin)</label>
-                        <select id="class-status" class="w-full px-4 py-2 border rounded-lg bg-yellow-50 focus:ring-2 focus:ring-yellow-500 outline-none text-sm">
-                            <option value="open">Aberto para Edição</option>
-                            <option value="closed">Fechado / Confirmado</option>
-                        </select>
-                    </div>
-
-                    <div class="pt-4 flex gap-3">
-                        <button type="button" onclick="closeModal()" class="flex-1 bg-slate-100 text-slate-600 py-3 rounded-xl font-bold hover:bg-slate-200 transition text-sm">Fechar</button>
-                        <button type="submit" id="submit-btn" class="flex-[2] mensa-blue text-white py-3 rounded-xl font-bold shadow-lg hover:opacity-90 transition text-sm">Guardar Alterações</button>
-                    </div>
-                </form>
+      <main className="max-w-5xl mx-auto px-6 py-12">
+        {/* Info Cards */}
+        <section className="grid md:grid-cols-3 gap-6 -mt-24 relative z-20 mb-16">
+          <div className="bg-white p-8 rounded-xl shadow-lg border-b-4 border-green-700">
+            <div className="bg-green-50 w-12 h-12 rounded-full flex items-center justify-center mb-4 text-green-700">
+               <Brain size={24} />
             </div>
+            <h3 className="font-bold text-lg mb-2">Potencial Cognitivo</h3>
+            <p className="text-sm text-gray-500 leading-relaxed">Ambiente desenhado para estimular mentes com alto QI através de desafios complexos.</p>
+          </div>
+          <div className="bg-white p-8 rounded-xl shadow-lg border-b-4 border-green-700">
+            <div className="bg-green-50 w-12 h-12 rounded-full flex items-center justify-center mb-4 text-green-700">
+               <Trophy size={24} />
+            </div>
+            <h3 className="font-bold text-lg mb-2">Treino Olímpico</h3>
+            <p className="text-sm text-gray-500 leading-relaxed">Preparação dedicada para MOBFOG, OBMEP e programas NASA (IASC).</p>
+          </div>
+          <div className="bg-white p-8 rounded-xl shadow-lg border-b-4 border-green-700">
+            <div className="bg-green-50 w-12 h-12 rounded-full flex items-center justify-center mb-4 text-green-700">
+               <Rocket size={24} />
+            </div>
+            <h3 className="font-bold text-lg mb-2">Projetos Ativos</h3>
+            <p className="text-sm text-gray-500 leading-relaxed">Aulas práticas de robótica, física e biologia genética aplicada.</p>
+          </div>
+        </section>
+
+        {/* Timeline do Calendário */}
+        <div className="max-w-4xl mx-auto">
+          <div className="flex items-center gap-4 mb-12">
+            <div className="h-px bg-gray-200 flex-1"></div>
+            <h2 className="text-2xl font-black text-gray-800 uppercase tracking-widest text-center">Cronograma de Aulas</h2>
+            <div className="h-px bg-gray-200 flex-1"></div>
+          </div>
+          
+          <div className="relative">
+            {/* Linha Central */}
+            <div className="absolute left-[20px] md:left-1/2 md:-ml-[1px] top-0 bottom-0 w-[2px] bg-green-100"></div>
+            
+            <div className="relative z-10">
+              {scheduleData.map((event, index) => (
+                <EventCard 
+                  key={event.id} 
+                  event={event} 
+                  isLeft={index % 2 === 0} 
+                />
+              ))}
+            </div>
+          </div>
         </div>
 
-        <footer class="bg-slate-200 py-6 text-center text-[10px] text-slate-500 uppercase tracking-widest">
-            &copy; 2026 Mini Mensa Brasil - Planejamento Centralizado
-        </footer>
+        {/* Call to Action ou Alerta */}
+        <section className="mt-20 bg-white border border-green-100 rounded-2xl p-8 flex flex-col md:flex-row items-center gap-8 shadow-sm">
+          <div className="bg-green-700 p-6 rounded-2xl text-white">
+            <Clock size={40} />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-xl font-bold mb-2">Horários Especiais de Olimpíadas</h3>
+            <p className="text-gray-600 text-sm mb-4">
+              {/* Alteração solicitada: 14:00 às 16:00 (Tarde) -> período da tarde aos sábados */}
+              Lembramos que nos dias de aula, os preparatórios ocorrem das <span className="font-bold text-green-700">10:30 às 12:00 (Manhã)</span> e <span className="font-bold text-green-700">no período da tarde aos sábados</span>.
+            </p>
+            <div className="flex gap-2">
+              <span className="bg-green-50 text-green-700 text-[10px] font-bold px-2 py-1 rounded">OBMEP</span>
+              <span className="bg-green-50 text-green-700 text-[10px] font-bold px-2 py-1 rounded">MOBFOG</span>
+              <span className="bg-green-50 text-green-700 text-[10px] font-bold px-2 py-1 rounded">NASA IASC</span>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      {/* Footer Estilo mensa.org.br */}
+      <footer className="bg-gray-100 border-t border-gray-200 pt-16 pb-8 px-6 mt-20">
+        <div className="max-w-5xl mx-auto grid md:grid-cols-4 gap-12 mb-12">
+          <div className="md:col-span-1">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="bg-green-700 p-1.5 rounded">
+                <Globe size={18} className="text-white" />
+              </div>
+              <span className="font-bold text-lg tracking-tighter text-green-900">MENSA <span className="text-gray-400 text-sm">Brasil</span></span>
+            </div>
+            <p className="text-xs text-gray-500 leading-relaxed font-medium">
+              A Mensa é a maior e mais antiga sociedade de alto QI do mundo. Uma organização sem fins lucrativos aberta a pessoas que pontuam no 98º percentil.
+            </p>
+          </div>
+          
+          <div>
+            <h4 className="text-green-700 font-bold text-xs uppercase tracking-widest mb-6">Programas</h4>
+            <ul className="text-xs space-y-3 text-gray-600 font-bold uppercase tracking-tighter">
+              <li className="hover:text-green-700 cursor-pointer">Mini Mensa</li>
+              <li className="hover:text-green-700 cursor-pointer">Iniciação Científica</li>
+              <li className="hover:text-green-700 cursor-pointer">Pesquisa</li>
+            </ul>
+          </div>
+          
+          <div>
+            <h4 className="text-green-700 font-bold text-xs uppercase tracking-widest mb-6">Membro</h4>
+            <ul className="text-xs space-y-3 text-gray-600 font-bold uppercase tracking-tighter">
+              <li className="hover:text-green-700 cursor-pointer">Testes de Admissão</li>
+              <li className="hover:text-green-700 cursor-pointer">Benefícios</li>
+              <li className="hover:text-green-700 cursor-pointer">Grupos SIG</li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-green-700 font-bold text-xs uppercase tracking-widest mb-6">Contato</h4>
+            <p className="text-xs text-gray-600 font-bold">UNIDADE SÃO PAULO</p>
+            <p className="text-xs text-gray-400 mt-2 italic">contato@mensa.org.br</p>
+          </div>
+        </div>
+        
+        <div className="max-w-5xl mx-auto pt-8 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center text-[10px] font-bold text-gray-400 tracking-widest uppercase">
+          <p>© 2024 MENSA BRASIL</p>
+          <div className="flex gap-4 mt-4 md:mt-0">
+            <span>Privacidade</span>
+            <span>Termos</span>
+          </div>
+        </div>
+      </footer>
     </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Configurações
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'mini-mensa-2026';
-        
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        
-        let currentUser = null;
-        let proposals = {};
-        let selectedMonth = 2; // Março
-
-        const months = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-
-        // Inicialização com Auth Anónimo (Evita erro de domínio)
-        const startApp = async () => {
-            try {
-                await signInAnonymously(auth);
-            } catch (err) {
-                console.error("Erro na ligação anónima:", err);
-            }
-        };
-
-        startApp();
-
-        onAuthStateChanged(auth, (user) => {
-            const savedUser = localStorage.getItem('miniMensa_userProfile');
-            if (user && savedUser) {
-                const profile = JSON.parse(savedUser);
-                currentUser = {
-                    ...profile,
-                    uid: user.uid,
-                    canEdit: profile.email.toLowerCase() === 'claudia@mensa.org.br'
-                };
-                enterApp();
-            }
-        });
-
-        window.handleManualLogin = (e) => {
-            e.preventDefault();
-            const email = document.getElementById('email-input').value.trim();
-            const name = document.getElementById('name-input').value.trim();
-            
-            const profile = { email, name };
-            localStorage.setItem('miniMensa_userProfile', JSON.stringify(profile));
-            
-            // Força o trigger do state change
-            window.location.reload();
-        };
-
-        function enterApp() {
-            document.getElementById('login-view').classList.add('hidden');
-            document.getElementById('calendar-view').classList.remove('hidden');
-            document.getElementById('user-info').classList.remove('hidden');
-            document.getElementById('user-display').textContent = currentUser.name.split(' ')[0];
-            
-            renderMonthFilters();
-            startDataListener();
-        }
-
-        function startDataListener() {
-            if (!auth.currentUser) return;
-            const proposalsRef = collection(db, 'artifacts', appId, 'public', 'data', 'proposals');
-            onSnapshot(proposalsRef, (snapshot) => {
-                snapshot.forEach(doc => { proposals[doc.id] = doc.data(); });
-                renderCalendar();
-            }, (err) => console.error("Erro no Firestore:", err));
-        }
-
-        const allSaturdays = (() => {
-            const sats = [];
-            let date = new Date(2026, 0, 1);
-            while (date.getDay() !== 6) date.setDate(date.getDate() + 1);
-            while (date.getFullYear() === 2026) {
-                sats.push(new Date(date));
-                date.setDate(date.getDate() + 7);
-            }
-            return sats;
-        })();
-
-        window.setMonth = (m) => { selectedMonth = m; renderMonthFilters(); renderCalendar(); };
-
-        function renderMonthFilters() {
-            const container = document.getElementById('month-filters');
-            container.innerHTML = months.map((month, idx) => {
-                if (idx < 2) return ''; 
-                return `<button onclick="window.setMonth(${idx})" class="px-5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${selectedMonth === idx ? 'mensa-blue text-white shadow-md' : 'bg-white text-slate-500 border border-slate-200'}">${month}</button>`;
-            }).join('');
-        }
-
-        function renderCalendar() {
-            const container = document.getElementById('calendar-container');
-            const filtered = allSaturdays.filter(d => d.getMonth() === selectedMonth);
-            container.innerHTML = filtered.map(date => {
-                const dateStr = date.toISOString().split('T')[0];
-                return `<div class="bg-white rounded-2xl overflow-hidden card-shadow border border-slate-100 fade-in">
-                    <div class="bg-slate-50 px-6 py-3 border-b border-slate-100">
-                        <span class="font-bold mensa-text text-base">${date.getDate()} de ${months[date.getMonth()]}</span>
-                    </div>
-                    <div class="divide-y divide-slate-50">
-                        ${renderSlot(dateStr, "08:00 - 09:00", 1)}
-                        ${renderSlot(dateStr, "09:00 - 10:00", 2)}
-                    </div>
-                </div>`;
-            }).join('');
-        }
-
-        function renderSlot(dateStr, timeStr, slotId) {
-            const id = `${dateStr}_${slotId}`;
-            const data = proposals[id];
-            const isClosed = data && data.status === 'closed';
-            const actionLabel = currentUser.canEdit ? (data ? 'Editar' : 'Planear') : 'Ver';
-            
-            return `<div class="p-4 flex flex-col md:flex-row gap-3 items-center">
-                <div class="${data ? (isClosed ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-900') : 'bg-slate-100 text-slate-400'} font-black px-3 py-1 rounded-lg text-[10px] w-full md:w-28 text-center">${timeStr}</div>
-                <div class="flex-grow text-center md:text-left">
-                    ${data ? `<h4 class="font-bold text-slate-900 text-sm">${data.theme}</h4><p class="text-blue-700 text-xs">${data.teacher}</p>` : `<span class="text-slate-300 italic text-xs">Vago...</span>`}
-                </div>
-                <button onclick="window.openProposalModal('${dateStr}', '${slotId}', '${timeStr}')" class="bg-slate-100 text-slate-600 px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-200 transition">${actionLabel}</button>
-            </div>`;
-        }
-
-        window.openProposalModal = (date, slot, time) => {
-            const id = `${date}_${slot}`;
-            const data = proposals[id] || {};
-            document.getElementById('form-date').value = date;
-            document.getElementById('form-slot').value = slot;
-            document.getElementById('modal-info').children[0].textContent = `${date.split('-').reverse().join('/')} às ${time}`;
-            document.getElementById('prof-name').value = data.teacher || (currentUser.canEdit ? currentUser.name : '');
-            document.getElementById('class-theme').value = data.theme || '';
-            document.getElementById('class-desc').value = data.desc || '';
-            document.getElementById('class-status').value = data.status || 'open';
-            
-            const inputs = ['prof-name', 'class-theme', 'class-desc', 'class-status'];
-            inputs.forEach(id => document.getElementById(id).disabled = !currentUser.canEdit);
-            document.getElementById('submit-btn').classList.toggle('hidden', !currentUser.canEdit);
-            document.getElementById('read-only-warning').classList.toggle('hidden', currentUser.canEdit);
-            document.getElementById('admin-extras').classList.toggle('hidden', !currentUser.canEdit);
-            document.getElementById('proposal-modal').classList.remove('hidden');
-        };
-
-        window.closeModal = () => document.getElementById('proposal-modal').classList.add('hidden');
-
-        document.getElementById('proposal-form').onsubmit = async (e) => {
-            e.preventDefault();
-            if (!currentUser || !currentUser.canEdit) return;
-            const date = document.getElementById('form-date').value;
-            const slot = document.getElementById('form-slot').value;
-            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'proposals', `${date}_${slot}`);
-            
-            try {
-                await setDoc(docRef, {
-                    teacher: document.getElementById('prof-name').value,
-                    theme: document.getElementById('class-theme').value,
-                    desc: document.getElementById('class-desc').value,
-                    status: document.getElementById('class-status').value,
-                    updatedAt: new Date().toISOString()
-                });
-                closeModal();
-            } catch (err) { console.error("Erro ao guardar:", err); }
-        };
-
-        window.logout = async () => { 
-            localStorage.removeItem('miniMensa_userProfile');
-            await signOut(auth); 
-            window.location.reload(); 
-        };
-    </script>
-</body>
-</html>
+  );
+}
