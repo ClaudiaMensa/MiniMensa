@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { 
-  Calendar, 
   Brain, 
   Rocket, 
   Palette, 
@@ -10,142 +9,30 @@ import {
   Trophy, 
   Clock, 
   GraduationCap,
-  ChevronDown,
-  ChevronUp,
+  ChevronDown, 
+  ChevronUp, 
   ShieldCheck,
-  Globe
+  Globe,
+  Sparkles
 } from 'lucide-react';
 
-// Dados da programação atualizados
 const scheduleData = [
-  { 
-    id: 1, 
-    date: "14/03", 
-    title: "Aula Inaugural", 
-    description: "Abertura do semestre com Ivana Rebelo e Claudia Aguiar. Horário especial: das 09:00 às 10:00.", 
-    type: "special",
-    icon: Star
-  },
-  { 
-    id: 2, 
-    date: "21/03", 
-    title: "Robótica & Olimpíadas", 
-    description: "08:30 - 10:30: Robótica com Prof. Rafael Truli Gomes (Poli USP). 10:30 - 12:00: Preparatório Olímpico com Claudia Aguiar. Tarde (14:00 - 16:00): Foguetes, OBMEP e Caça Asteroides.", 
-    type: "robotics",
-    icon: Bot
-  },
-  { 
-    id: 3, 
-    date: "28/03", 
-    title: "Projeto Quasar", 
-    description: "Coordenação de Claudia Aguiar. Aulas com Isabela Bicalho (Projeto Quasar) e com o Astronauta Análogo Francesco.", 
-    type: "science",
-    icon: Rocket
-  },
-  { 
-    id: 4, 
-    date: "04/04", 
-    title: "Oficina de Páscoa", 
-    description: "Oficina especial de criação de Ovos de Páscoa.", 
-    type: "art",
-    icon: Palette
-  },
-  { 
-    id: 5, 
-    date: "11/04", 
-    title: "Robótica com Prof. Rafael Truli", 
-    description: "Aula prática de robótica e programação.", 
-    type: "robotics",
-    icon: Bot
-  },
-  { 
-    id: 6, 
-    date: "18/04", 
-    title: "Desenho e Artes Plásticas", 
-    description: "Aulas de desenho e artes plásticas explorando a criatividade.", 
-    type: "art",
-    icon: Palette
-  },
-  { 
-    id: 7, 
-    date: "25/04", 
-    title: "Física", 
-    description: "Aulas de física avançada e experimental com o professor Bruno.", 
-    type: "science",
-    icon: TestTube
-  },
-  { 
-    id: 8, 
-    date: "02/05", 
-    title: "Robótica", 
-    description: "Aprofundamento em projetos de robótica.", 
-    type: "robotics",
-    icon: Bot
-  },
-  { 
-    id: 9, 
-    date: "09/05", 
-    title: "Desenho", 
-    description: "Técnicas avançadas de desenho.", 
-    type: "art",
-    icon: Palette
-  },
-  { 
-    id: 10, 
-    date: "16/05", 
-    title: "Biologia e Genética", 
-    description: "Exploração do mundo da biologia e os segredos da genética.", 
-    type: "science",
-    icon: TestTube
-  },
-  { 
-    id: 11, 
-    date: "23/05", 
-    title: "Robótica", 
-    description: "Aula de robótica com o Prof. Rafael Truli Gomes.", 
-    type: "robotics",
-    icon: Bot
-  },
-  { 
-    id: 12, 
-    date: "30/05", 
-    title: "Artes e Desenho", 
-    description: "Expressão artística e desenvolvimento criativo.", 
-    type: "art",
-    icon: Palette
-  },
-  { 
-    id: 13, 
-    date: "04/06", 
-    title: "Engenhocas e Mecânica", 
-    description: "Aula de engenhocas focada em desafios de física e mecânica aplicada com a Profa. Claudia Aguiar.", 
-    type: "science",
-    icon: Brain
-  },
-  { 
-    id: 14, 
-    date: "11/06", 
-    title: "Robótica", 
-    description: "Desenvolvimento final de projetos com o Prof. Rafael.", 
-    type: "robotics",
-    icon: Bot
-  },
-  { 
-    id: 15, 
-    date: "18/06", 
-    title: "Desenho", 
-    description: "Finalização dos portfólios de artes e desenho.", 
-    type: "art",
-    icon: Palette
-  },
-  { 
-    id: 16, 
-    date: "25/06", 
-    title: "Encerramento do Semestre", 
-    description: "Aula especial de confraternização e encerramento das atividades do semestre.", 
-    type: "special",
-    icon: GraduationCap
-  }
+  { id: 1, date: "14/03", title: "Aula Inaugural", description: "Abertura do semestre com Ivana Rebelo e Claudia Aguiar. Horário especial: das 09:00 às 10:00.", type: "special", icon: Star },
+  { id: 2, date: "21/03", title: "Robótica & Olimpíadas", description: "08:30 - 10:30: Robótica com Prof. Rafael Truli Gomes (Poli USP). 10:30 - 12:00: Preparatório Olímpico com Claudia Aguiar. Tarde: Foguetes, OBMEP e Caça Asteroides.", type: "robotics", icon: Bot },
+  { id: 3, date: "28/03", title: "Projeto Quasar", description: "Coordenação de Claudia Aguiar. Aulas com Isabela Bicalho e com o Astronauta Análogo Francesco.", type: "science", icon: Rocket },
+  { id: 4, date: "04/04", title: "Oficina de Páscoa", description: "Oficina criativa especial temática.", type: "art", icon: Palette },
+  { id: 5, date: "11/04", title: "Robótica Avançada", description: "Aula prática de robótica e programação com o Prof. Rafael Truli.", type: "robotics", icon: Bot },
+  { id: 6, date: "18/04", title: "Artes Plásticas", description: "Desenvolvimento criativo e expressão artística.", type: "art", icon: Palette },
+  { id: 7, date: "25/04", title: "Física Experimental", description: "Aulas de física avançada com o professor Bruno.", type: "science", icon: TestTube },
+  { id: 8, date: "02/05", title: "Robótica", description: "Aprofundamento em projetos de engenharia e mecânica robótica.", type: "robotics", icon: Bot },
+  { id: 9, date: "09/05", title: "Desenho Técnico", description: "Técnicas de desenho e desenvolvimento de portfólio.", type: "art", icon: Palette },
+  { id: 10, date: "16/05", title: "Biologia e Genética", description: "Exploração de conceitos modernos de genética e biologia molecular.", type: "science", icon: TestTube },
+  { id: 11, date: "23/05", title: "Robótica", description: "Sessão prática com o Prof. Rafael Truli Gomes.", type: "robotics", icon: Bot },
+  { id: 12, date: "30/05", title: "Artes", description: "Expressão artística e desenvolvimento criativo.", type: "art", icon: Palette },
+  { id: 13, date: "04/06", title: "Engenhocas e Mecânica", description: "Aula de engenhocas focada em desafios de física e mecânica aplicada com a Profa. Claudia Aguiar.", type: "science", icon: Brain },
+  { id: 14, date: "11/06", title: "Robótica", description: "Finalização de projetos e testes práticos.", type: "robotics", icon: Bot },
+  { id: 15, date: "18/06", title: "Portfólio de Artes", description: "Conclusão e apresentação dos trabalhos artísticos.", type: "art", icon: Palette },
+  { id: 16, date: "25/06", title: "Encerramento do Semestre", description: "Confraternização e revisão das conquistas do semestre.", type: "special", icon: GraduationCap }
 ];
 
 const EventCard = ({ event, isLeft }) => {
@@ -153,34 +40,30 @@ const EventCard = ({ event, isLeft }) => {
   const Icon = event.icon;
   
   return (
-    <div className={`mb-10 flex justify-between items-center w-full ${isLeft ? 'flex-row-reverse' : ''}`}>
+    <div className={`mb-8 flex justify-between items-center w-full ${isLeft ? 'flex-row-reverse' : ''}`}>
       <div className="hidden md:block w-5/12"></div>
-      
       <div className="z-20 relative">
-        <div className="flex items-center justify-center w-10 h-10 rounded-full bg-green-700 text-white shadow-md border-2 border-white">
+        <div className="flex items-center justify-center w-10 h-10 rounded-full bg-green-700 text-white shadow-lg border-2 border-white">
           <Icon size={18} />
         </div>
       </div>
-      
       <div className="w-full md:w-5/12 pl-6 md:pl-0">
         <div 
-          className="bg-white p-5 rounded-lg shadow-sm border border-gray-100 hover:border-green-200 transition-all cursor-pointer"
+          className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:border-green-200 transition-all cursor-pointer group"
           onClick={() => setIsExpanded(!isExpanded)}
         >
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-[10px] font-black tracking-widest text-green-700 uppercase bg-green-50 px-2 py-1 rounded">
+          <div className="flex justify-between items-center mb-1">
+            <span className="text-[10px] font-bold tracking-widest text-green-700 uppercase bg-green-50 px-2 py-0.5 rounded">
               {event.date}
             </span>
-            <div className="text-gray-300">
+            <div className="text-gray-300 group-hover:text-green-500">
               {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
             </div>
           </div>
-          
-          <h3 className="text-lg font-bold text-gray-800 mb-1 leading-tight">
+          <h3 className="text-lg font-bold text-gray-800 leading-tight">
             {event.title}
           </h3>
-          
-          <div className={`text-gray-600 text-sm leading-relaxed transition-all duration-300 ${isExpanded ? 'max-h-40 mt-3 opacity-100' : 'max-h-0 md:max-h-20 overflow-hidden'}`}>
+          <div className={`text-gray-600 text-sm leading-relaxed transition-all duration-300 overflow-hidden ${isExpanded ? 'max-h-40 mt-3 opacity-100' : 'max-h-0 opacity-0'}`}>
             <p>{event.description}</p>
           </div>
         </div>
@@ -191,170 +74,118 @@ const EventCard = ({ event, isLeft }) => {
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-[#f4f7f4] font-sans text-gray-900 selection:bg-green-100">
-      {/* Top Banner Estilo Mensa */}
-      <div className="bg-[#004a2f] text-white text-[10px] py-1.5 px-6 font-bold tracking-[0.2em] uppercase flex justify-between items-center">
-        <span>Mensa Brasil - A Sociedade de Alto QI</span>
-        <div className="flex gap-4">
-          <span className="opacity-70">Internacional</span>
-        </div>
+    <div className="min-h-screen bg-[#f8faf8] font-sans text-gray-900">
+      <div className="bg-[#003d26] text-white text-[10px] py-2 px-6 font-bold tracking-[0.2em] uppercase flex justify-between items-center">
+        <span>Mensa Brasil - High IQ Society</span>
+        <span className="opacity-70 uppercase tracking-widest">Inovação e Talento</span>
       </div>
 
-      {/* Navbar Principal */}
       <nav className="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center sticky top-0 z-50">
         <div className="flex items-center gap-3">
           <div className="bg-green-700 p-2 rounded-lg">
              <Globe size={24} className="text-white" />
           </div>
           <div>
-            <h1 className="font-bold text-xl leading-none text-green-900 tracking-tighter">MENSA</h1>
+            <h1 className="font-bold text-xl leading-none text-green-900 tracking-tighter uppercase">Mensa</h1>
             <span className="text-[10px] font-bold text-gray-400 tracking-[0.3em] uppercase">Brasil</span>
           </div>
         </div>
         <div className="flex gap-8 text-[11px] font-bold uppercase tracking-widest text-gray-600">
-          <a href="#" className="text-green-700 border-b-2 border-green-700 pb-1">Planejamento</a>
-          <a href="#" className="hover:text-green-700 transition-colors hidden sm:block">Programas Educacionais</a>
-          <a href="#" className="hover:text-green-700 transition-colors hidden md:block">Apoio ao Superdotado</a>
+          <span className="text-green-700 border-b-2 border-green-700 pb-1 cursor-pointer">Planejamento</span>
+          <span className="hover:text-green-700 cursor-pointer hidden sm:block">Programas</span>
+          <span className="hover:text-green-700 cursor-pointer hidden md:block">Sobre</span>
         </div>
-        <div className="w-10 md:hidden"></div>
+        <div className="w-10"></div>
       </nav>
 
-      {/* Header com estilo verde institucional */}
       <header className="relative bg-[#004a2f] py-20 px-6 overflow-hidden">
         <div className="absolute top-0 right-0 w-1/3 h-full opacity-10 pointer-events-none">
           <Brain size={400} className="text-white -mr-20 -mt-20" />
         </div>
-        
         <div className="max-w-4xl mx-auto relative z-10">
           <div className="mb-6 flex items-center gap-2">
             <ShieldCheck size={20} className="text-green-400" />
-            <span className="text-green-300 text-xs font-bold uppercase tracking-[0.2em]">Programa de Enriquecimento</span>
+            <span className="text-green-300 text-xs font-bold uppercase tracking-[0.2em]">Enriquecimento Cognitivo</span>
           </div>
-          <h2 className="text-4xl md:text-6xl font-extrabold text-white mb-6 leading-none">
+          <h2 className="text-5xl md:text-7xl font-extrabold text-white mb-6 leading-[0.9] tracking-tighter">
             Planejamento Semestral <br />
             <span className="text-green-400">Mini Mensa 2024</span>
           </h2>
-          <p className="text-lg md:text-xl text-green-50/80 font-medium max-w-2xl leading-relaxed">
-            Desenvolvendo o potencial de Jovens Brilhantes através de atividades integrativas de alta performance cognitiva.
+          <p className="text-xl md:text-2xl text-green-50/80 font-medium max-w-2xl leading-relaxed">
+            Desenvolvendo o potencial de <span className="text-white font-bold underline decoration-green-400">Jovens Brilhantes</span> através de atividades de alta performance cognitiva.
           </p>
         </div>
       </header>
 
       <main className="max-w-5xl mx-auto px-6 py-12">
-        {/* Info Cards */}
-        <section className="grid md:grid-cols-3 gap-6 -mt-24 relative z-20 mb-16">
-          <div className="bg-white p-8 rounded-xl shadow-lg border-b-4 border-green-700">
-            <div className="bg-green-50 w-12 h-12 rounded-full flex items-center justify-center mb-4 text-green-700">
+        <section className="grid md:grid-cols-3 gap-6 -mt-24 relative z-20 mb-20">
+          <div className="bg-white p-8 rounded-2xl shadow-xl border-b-4 border-green-700">
+            <div className="bg-green-50 w-12 h-12 rounded-xl flex items-center justify-center mb-4 text-green-700">
                <Brain size={24} />
             </div>
-            <h3 className="font-bold text-lg mb-2">Potencial Cognitivo</h3>
-            <p className="text-sm text-gray-500 leading-relaxed">Ambiente desenhado para estimular mentes com alto QI através de desafios complexos.</p>
+            <h3 className="font-bold text-lg mb-2 text-green-900 uppercase tracking-tighter">Objetivos</h3>
+            <p className="text-sm text-gray-500 leading-relaxed">Programa extracurricular focado no estímulo ao alto QI, atuando de forma complementar e diferenciada da grade escolar tradicional.</p>
           </div>
-          <div className="bg-white p-8 rounded-xl shadow-lg border-b-4 border-green-700">
-            <div className="bg-green-50 w-12 h-12 rounded-full flex items-center justify-center mb-4 text-green-700">
+          <div className="bg-white p-8 rounded-2xl shadow-xl border-b-4 border-green-700">
+            <div className="bg-green-50 w-12 h-12 rounded-xl flex items-center justify-center mb-4 text-green-700">
                <Trophy size={24} />
             </div>
-            <h3 className="font-bold text-lg mb-2">Treino Olímpico</h3>
-            <p className="text-sm text-gray-500 leading-relaxed">Preparação dedicada para MOBFOG, OBMEP e programas NASA (IASC).</p>
+            <h3 className="font-bold text-lg mb-2 text-green-900 uppercase tracking-tighter">Auxílio Preparatório</h3>
+            <p className="text-sm text-gray-500 leading-relaxed">Preparação dedicada para Olimpíadas Científicas como MOBFOG, programas NASA (IASC), OBMEP e outras.</p>
           </div>
-          <div className="bg-white p-8 rounded-xl shadow-lg border-b-4 border-green-700">
-            <div className="bg-green-50 w-12 h-12 rounded-full flex items-center justify-center mb-4 text-green-700">
-               <Rocket size={24} />
+          <div className="bg-white p-8 rounded-2xl shadow-xl border-b-4 border-green-700">
+            <div className="bg-green-50 w-12 h-12 rounded-xl flex items-center justify-center mb-4 text-green-700">
+               <Sparkles size={24} />
             </div>
-            <h3 className="font-bold text-lg mb-2">Projetos Ativos</h3>
-            <p className="text-sm text-gray-500 leading-relaxed">Aulas práticas de robótica, física e biologia genética aplicada.</p>
+            <h3 className="font-bold text-lg mb-2 text-green-900 uppercase tracking-tighter">Conhecimento Integrado</h3>
+            <p className="text-sm text-gray-500 leading-relaxed">
+              Física, Biologia, Matemática, Astronomia e Artes em aulas práticas integrando robótica e engenhosidade técnica. 
+              <span className="block mt-2 font-semibold italic text-green-700 text-xs">A nossa ideia é trazer saberes diversos para agitar e desafiar estas mentes brilhantes.</span>
+            </p>
           </div>
         </section>
 
-        {/* Timeline do Calendário */}
         <div className="max-w-4xl mx-auto">
-          <div className="flex items-center gap-4 mb-12">
+          <div className="flex items-center gap-4 mb-16">
             <div className="h-px bg-gray-200 flex-1"></div>
-            <h2 className="text-2xl font-black text-gray-800 uppercase tracking-widest text-center">Cronograma de Aulas</h2>
+            <h2 className="text-2xl font-black text-gray-800 uppercase tracking-widest text-center">Calendário de Aulas</h2>
             <div className="h-px bg-gray-200 flex-1"></div>
           </div>
-          
           <div className="relative">
-            {/* Linha Central */}
             <div className="absolute left-[20px] md:left-1/2 md:-ml-[1px] top-0 bottom-0 w-[2px] bg-green-100"></div>
-            
             <div className="relative z-10">
               {scheduleData.map((event, index) => (
-                <EventCard 
-                  key={event.id} 
-                  event={event} 
-                  isLeft={index % 2 === 0} 
-                />
+                <EventCard key={event.id} event={event} isLeft={index % 2 === 0} />
               ))}
             </div>
           </div>
         </div>
 
-        {/* Call to Action ou Alerta */}
-        <section className="mt-20 bg-white border border-green-100 rounded-2xl p-8 flex flex-col md:flex-row items-center gap-8 shadow-sm">
-          <div className="bg-green-700 p-6 rounded-2xl text-white">
-            <Clock size={40} />
+        <section className="mt-20 bg-white border-2 border-green-100 rounded-3xl p-10 flex flex-col md:flex-row items-center gap-8 shadow-sm">
+          <div className="bg-green-700 p-6 rounded-2xl text-white shadow-lg">
+            <Clock size={48} />
           </div>
           <div className="flex-1">
-            <h3 className="text-xl font-bold mb-2">Horários Especiais de Olimpíadas</h3>
-            <p className="text-gray-600 text-sm mb-4">
-              {/* Alteração solicitada: 14:00 às 16:00 (Tarde) -> período da tarde aos sábados */}
-              Lembramos que nos dias de aula, os preparatórios ocorrem das <span className="font-bold text-green-700">10:30 às 12:00 (Manhã)</span> e <span className="font-bold text-green-700">no período da tarde aos sábados</span>.
+            <h3 className="text-2xl font-bold mb-3 text-green-900 uppercase tracking-tighter">Horários de Preparatórios</h3>
+            <p className="text-gray-600 text-lg leading-relaxed">
+              Nos dias de aula, os preparatórios ocorrem das <span className="font-bold text-green-700 bg-green-50 px-2 py-1 rounded">10:30 às 12:00 (Manhã)</span> e <span className="font-bold text-green-700 bg-green-50 px-2 py-1 rounded">no período da tarde aos sábados</span>.
             </p>
-            <div className="flex gap-2">
-              <span className="bg-green-50 text-green-700 text-[10px] font-bold px-2 py-1 rounded">OBMEP</span>
-              <span className="bg-green-50 text-green-700 text-[10px] font-bold px-2 py-1 rounded">MOBFOG</span>
-              <span className="bg-green-50 text-green-700 text-[10px] font-bold px-2 py-1 rounded">NASA IASC</span>
-            </div>
           </div>
         </section>
       </main>
 
-      {/* Footer Estilo mensa.org.br */}
-      <footer className="bg-gray-100 border-t border-gray-200 pt-16 pb-8 px-6 mt-20">
-        <div className="max-w-5xl mx-auto grid md:grid-cols-4 gap-12 mb-12">
-          <div className="md:col-span-1">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="bg-green-700 p-1.5 rounded">
-                <Globe size={18} className="text-white" />
-              </div>
-              <span className="font-bold text-lg tracking-tighter text-green-900">MENSA <span className="text-gray-400 text-sm">Brasil</span></span>
+      <footer className="bg-gray-100 border-t border-gray-200 py-12 px-6 mt-20">
+        <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] font-black text-gray-400 tracking-widest uppercase">
+          <div className="flex items-center gap-2">
+            <div className="bg-green-700 p-1 rounded">
+              <Globe size={14} className="text-white" />
             </div>
-            <p className="text-xs text-gray-500 leading-relaxed font-medium">
-              A Mensa é a maior e mais antiga sociedade de alto QI do mundo. Uma organização sem fins lucrativos aberta a pessoas que pontuam no 98º percentil.
-            </p>
+            <span className="text-green-900">Mensa Brasil</span>
           </div>
-          
-          <div>
-            <h4 className="text-green-700 font-bold text-xs uppercase tracking-widest mb-6">Programas</h4>
-            <ul className="text-xs space-y-3 text-gray-600 font-bold uppercase tracking-tighter">
-              <li className="hover:text-green-700 cursor-pointer">Mini Mensa</li>
-              <li className="hover:text-green-700 cursor-pointer">Iniciação Científica</li>
-              <li className="hover:text-green-700 cursor-pointer">Pesquisa</li>
-            </ul>
-          </div>
-          
-          <div>
-            <h4 className="text-green-700 font-bold text-xs uppercase tracking-widest mb-6">Membro</h4>
-            <ul className="text-xs space-y-3 text-gray-600 font-bold uppercase tracking-tighter">
-              <li className="hover:text-green-700 cursor-pointer">Testes de Admissão</li>
-              <li className="hover:text-green-700 cursor-pointer">Benefícios</li>
-              <li className="hover:text-green-700 cursor-pointer">Grupos SIG</li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="text-green-700 font-bold text-xs uppercase tracking-widest mb-6">Contato</h4>
-            <p className="text-xs text-gray-600 font-bold">UNIDADE SÃO PAULO</p>
-            <p className="text-xs text-gray-400 mt-2 italic">contato@mensa.org.br</p>
-          </div>
-        </div>
-        
-        <div className="max-w-5xl mx-auto pt-8 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center text-[10px] font-bold text-gray-400 tracking-widest uppercase">
-          <p>© 2024 MENSA BRASIL</p>
-          <div className="flex gap-4 mt-4 md:mt-0">
+          <p>© 2024 - PROGRAMA MINI MENSA</p>
+          <div className="flex gap-4">
             <span>Privacidade</span>
-            <span>Termos</span>
+            <span>Contato</span>
           </div>
         </div>
       </footer>
