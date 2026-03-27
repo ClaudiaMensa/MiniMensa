@@ -41,7 +41,17 @@
 
         const scheduleData = [
             { id: 1, date: "14/03", title: "Aula Inaugural", description: "Abertura do semestre com Ivana Rebello e Claudia Aguiar. Horário especial: das 09:00 às 10:00.", icon: "star" },
-            { id: 2, date: "21/03", title: "Robótica", description: "Manhã: Aula de Robótica com Prof. Rafael Traldi Moura (Poli USP).\n\nPara esta aula Imprimir pelo menos 5 folhas do seguinte PDF: ", link: "folhaisometrica.pdf", linkText: "Folha Isométrica", icon: "bot" },
+            { 
+                id: 2, 
+                date: "21/03", 
+                title: "Robótica", 
+                description: "Manhã: Aula de Robótica com Prof. Rafael Traldi Moura (Poli USP).\n\nPara esta aula Imprimir pelo menos 5 folhas do seguinte PDF: ", 
+                links: [
+                    { url: "folhaisometrica.pdf", text: "Folha Isométrica" },
+                    { url: "./PMR3202_robotica.pdf", text: "Material de Robótica (PMR3202)" }
+                ],
+                icon: "bot" 
+            },
             { id: 3, date: "28/03", title: "Projeto Quasar - Astronomia", description: "Desta vez sobre Astronomia: Aulas preparadas durante o Projeto Quasar com Isabela Bicalho sobre a teoria do Espaço-Tempo e com o Astronauta Análogo Cadete Francesco Vittório.", icon: "rocket" },
             { id: 4, date: "04/04", title: "Oficina de Páscoa", description: "Oficina divertida especial temática. Prepare suas forminhas de ovos de pascoa, ou de coelhos, compre barras de chocolate e tenha preparado um micro ondas ou um banho maria para derreter seu chocolate. Se achar divertido pode usar uma tiara com orelhas de coelhos. Pinceis de tamanhos diversos também serão uteis.", icon: "palette" },
             { id: 5, date: "11/04", title: "Arte e Criatividade", description: "Aula de Arte e Criatividade.\n\nPensar Criar e transformar com ideias que ganham formas.\n\nCom Prof. Tales Ebner, artista multidisciplinar.", icon: "palette" },
@@ -89,6 +99,22 @@
                                 {event.description.split('\n').map((line, i) => (
                                     <p key={i} className={line.trim() === "" ? "h-2" : "mb-1"}>{line}</p>
                                 ))}
+                                
+                                {event.links && event.links.map((link, idx) => (
+                                    <div key={idx} className="mt-2 p-3 bg-red-50 border border-red-100 rounded-lg flex items-center gap-2">
+                                        <Icon name="file-text" size={16} className="text-red-600" />
+                                        <a 
+                                            href={link.url} 
+                                            target="_blank" 
+                                            rel="noopener noreferrer" 
+                                            className="text-red-700 font-bold hover:underline"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            {link.text}
+                                        </a>
+                                    </div>
+                                ))}
+
                                 {event.link && (
                                     <div className="mt-2 p-3 bg-red-50 border border-red-100 rounded-lg flex items-center gap-2">
                                         <Icon name="file-text" size={16} className="text-red-600" />
