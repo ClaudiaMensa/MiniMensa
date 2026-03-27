@@ -42,8 +42,8 @@
         const scheduleData = [
             { id: 1, date: "14/03", title: "Aula Inaugural", description: "Abertura do semestre com Ivana Rebello e Claudia Aguiar. Horário especial: das 09:00 às 10:00.", icon: "star" },
             { id: 2, date: "21/03", title: "Robótica", description: "Manhã: Aula de Robótica com Prof. Rafael Traldi Moura (Poli USP).\n\nPara esta aula Imprimir pelo menos 5 folhas do seguinte PDF: ", link: "folhaisometrica.pdf", linkText: "Folha Isométrica", icon: "bot" },
-            { id: 3, date: "28/03", title: "Projeto Quasar", description: "Aulas preparadas durante o Projeto Quasar com Isabela Bicalho sobre a teoria do Espaço-Tempo e com o Astronauta Análogo Cadete Francesco Vittório.", icon: "rocket" },
-            { id: 4, date: "04/04", title: "Oficina de Páscoa", description: "Oficina divertida especial temática.", icon: "palette" },
+            { id: 3, date: "28/03", title: "Projeto Quasar - Astronomia", description: "Desta vez sobre Astronomia: Aulas preparadas durante o Projeto Quasar com Isabela Bicalho sobre a teoria do Espaço-Tempo e com o Astronauta Análogo Cadete Francesco Vittório.", icon: "rocket" },
+            { id: 4, date: "04/04", title: "Oficina de Páscoa", description: "Oficina divertida especial temática. Prepare suas forminhas de ovos de pascoa, ou de coelhos, compre barras de chocolate e tenha preparado um micro ondas ou um banho maria para derreter seu chocolate. Se achar divertido pode usar uma tiara com orelhas de coelhos. Pinceis de tamanhos diversos também serão uteis.", icon: "palette" },
             { id: 5, date: "11/04", title: "Arte e Criatividade", description: "Aula de Arte e Criatividade.\n\nPensar Criar e transformar com ideias que ganham formas.\n\nCom Prof. Tales Ebner, artista multidisciplinar.", icon: "palette" },
             { id: 6, videoId: "18/04", date: "18/04", title: "Robótica", description: "Oficina de robótica e programação com o Prof. Rafael Traldi Moura da Universidade de São Paulo - Escola Politécnica.", icon: "bot" },
             { id: 7, date: "25/04", title: "Física Experimental", description: "Aulas com princípios de física avançada com o professor Bruno da Universidade Federal do ABC.", icon: "test-tube" },
@@ -85,7 +85,7 @@
                             <h3 className="text-lg font-bold text-gray-800 leading-tight">
                                 {event.title}
                             </h3>
-                            <div className={`text-gray-600 text-sm leading-relaxed transition-all duration-300 overflow-hidden ${isExpanded ? 'max-h-64 mt-3 opacity-100' : 'max-h-0 opacity-0'}`}>
+                            <div className={`text-gray-600 text-sm leading-relaxed transition-all duration-300 overflow-hidden ${isExpanded ? 'max-h-[500px] mt-3 opacity-100' : 'max-h-0 opacity-0'}`}>
                                 {event.description.split('\n').map((line, i) => (
                                     <p key={i} className={line.trim() === "" ? "h-2" : "mb-1"}>{line}</p>
                                 ))}
@@ -241,16 +241,22 @@
                                     <p>
                                         Os horários de preparatórios para as olimpíadas serão definidos de acordo com as olimpíadas para as quais nossos <span className="font-bold text-green-700">JBs</span> estiverem interessados em participar e de acordo com a disponibilidade dos Professores.
                                     </p>
-                                    <p className="bg-green-50 p-4 rounded-xl border-l-4 border-green-700 font-medium">
-                                        Neste <span className="font-bold">Sábado 21/03</span> teremos um encontro das <span className="text-green-800 font-bold">15 às 16 hs</span> para falar disto.
-                                    </p>
+                                    <div className="bg-green-50 p-6 rounded-xl border-l-4 border-green-700 font-medium space-y-3 shadow-inner">
+                                        <p className="text-green-900 font-bold">Próximos Encontros:</p>
+                                        <p>
+                                            Neste <span className="font-bold">Sábado 28/03</span> teremos um encontro das <span className="text-green-800 font-bold">15 às 16:30 hs</span> preparatório para <span className="text-green-800 font-bold">OBA/MOBFOG</span>.
+                                        </p>
+                                        <p>
+                                            E das <span className="text-green-800 font-bold">17 as 18:30</span> voltamos no mesmo link com preparatório para <span className="text-green-800 font-bold">olimpíadas de Matemática</span>.
+                                        </p>
+                                    </div>
                                     <div className="mt-4 pt-2">
                                         <a 
                                             href="link4.html" 
                                             className="inline-flex items-center gap-2 px-6 py-3 bg-green-700 text-white font-bold rounded-xl hover:bg-green-800 transition-colors shadow-md group"
                                         >
                                             <Icon name="link" size={18} className="text-green-200" />
-                                            Acessar Encontro 21/03 (15:00)
+                                            Acessar Link dos Encontros (28/03)
                                             <Icon name="chevron-right" size={16} className="group-hover:translate-x-1 transition-transform" />
                                         </a>
                                     </div>
