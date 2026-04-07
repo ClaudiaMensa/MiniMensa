@@ -60,7 +60,13 @@
                 description: "Oficina divertida especial temática. Prepare suas forminhas de ovos de pascoa, ou de coelhos, compre barras de chocolate e tenha preparado um micro ondas ou um banho maria para derreter seu chocolate. Se achar divertido pode usar uma tiara com orelhas de coelhos. Pinceis de tamanhos diversos também serão uteis.\n\nPrepare ovos vazios quebrados na ponta. Guarde a casca depois de higienizar (lavando com detergente e deixando secar). Traga tinta (guache ou acrilica), no lugar de tinta pode usar esmalte de unha e traga papel crepom ou forminhas de brigadeiro e cola. Para colocar dentro: MM ou amendoim/castanhas quebradas doce.\n\nNeste sábado participação especial de nossa diretora de Bem-Estar: Ivana Rebello.", 
                 icon: "palette" 
             },
-            { id: 5, date: "11/04", title: "Arte e Criatividade", description: "Aula de Arte e Criatividade.\n\nPensar Criar e transformar com ideias que ganham formas.\n\nCom Prof. Tales Ebner, artista multidisciplinar.", icon: "palette" },
+            { 
+                id: 5, 
+                date: "11/04", 
+                title: "Arte e Criatividade", 
+                description: "Pensar, criar e transformar com ideias que ganham forma\n\nNesse sábado teremos uma oficina prática voltada à experimentação artística, com foco em ampliar a percepção de que a arte vai além do desenho. Ao longo de 3 horas, os JBs serão incentivados a explorar materiais diversos, trabalhar com texturas, cores e composição, e transformar ideias em formas visuais. A proposta combina momentos de exploração livre com desafios guiados, estimulando a autonomia criativa e a expressão individual.\n\nA atividade terá adaptações por faixa etária e será progressiva. Serão utilizados materiais simples como lápis, aquarela, papéis variados, elementos naturais e itens para colagem. Não é necessário conhecimento prévio. O foco está no processo, na experimentação e na construção de repertório criativo, sem julgamento estético.\n\nCom o prof. Tales Ebner, artista multidisciplinar.", 
+                icon: "palette" 
+            },
             { id: 6, videoId: "18/04", date: "18/04", title: "Robótica", description: "Oficina de robótica e programação com o Prof. Rafael Traldi Moura da Universidade de São Paulo - Escola Politécnica.", icon: "bot" },
             { id: 7, date: "25/04", title: "Física Experimental", description: "Aulas com princípios de física avançada com o professor Bruno da Universidade Federal do ABC.", icon: "test-tube" },
             { id: 8, date: "02/05", title: "Robótica", description: "Aprofundamento em projetos de engenharia e mecânica robótica.\n\nCom o Professor Rafael Traldi Moura da Poli USP", icon: "bot" },
@@ -101,7 +107,7 @@
                             <h3 className="text-lg font-bold text-gray-800 leading-tight">
                                 {event.title}
                             </h3>
-                            <div className={`text-gray-600 text-sm leading-relaxed transition-all duration-300 overflow-hidden ${isExpanded ? 'max-h-[800px] mt-3 opacity-100' : 'max-h-0 opacity-0'}`}>
+                            <div className={`text-gray-600 text-sm leading-relaxed transition-all duration-300 overflow-hidden ${isExpanded ? 'max-h-[1200px] mt-3 opacity-100' : 'max-h-0 opacity-0'}`}>
                                 {event.description.split('\n').map((line, i) => (
                                     <p key={i} className={line.trim() === "" ? "h-2" : "mb-2"}>{line}</p>
                                 ))}
@@ -143,6 +149,8 @@
         };
 
         function App() {
+            const recordingsUrl = "https://onedrive.live.com/?cid=49a93f54e8dd4ede&id=49A93F54E8DD4EDE%21s3480cfbbc096403aa268467696aec41b&resid=49A93F54E8DD4EDE%21s3480cfbbc096403aa268467696aec41b&ithint=folder&e=pA3N51&migratedtospo=true&redeem=aHR0cHM6Ly8xZHJ2Lm1zL2YvYy80OWE5M2Y1NGU4ZGQ0ZWRlL0lnQzd6NEEwbHNBNlFLSm9SbmFXcnNRYkFXdE82ZzlYRzd5alR0VnFTRmppZjZZP2U9cEEzTjUx&v=validatepermission";
+
             return (
                 <div className="min-h-screen bg-[#f8faf8] font-sans text-gray-900">
                     <div className="bg-[#003d26] text-white text-[10px] py-2 px-6 font-bold tracking-[0.2em] uppercase flex justify-between items-center">
@@ -162,7 +170,14 @@
                         </div>
                         <div className="flex gap-8 text-[11px] font-bold uppercase tracking-widest text-gray-600">
                             <span className="text-green-700 border-b-2 border-green-700 pb-1 cursor-pointer">Planejamento</span>
-                            <span className="hover:text-green-700 cursor-pointer hidden sm:block">Programas</span>
+                            <a 
+                                href={recordingsUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="hover:text-green-700 cursor-pointer hidden sm:block transition-colors"
+                            >
+                                Gravados
+                            </a>
                             <span className="hover:text-green-700 cursor-pointer hidden md:block">Sobre</span>
                         </div>
                         <div className="w-10"></div>
