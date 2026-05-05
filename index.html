@@ -77,9 +77,17 @@
                 description: "Uma conversa sobre Robótica, com Claudia Aguiar.\nEstaremos nesta manhã das 8 as 11 no mesmo link. Sugerimos entrar no horário adequado a sua idade para encontrar a sua turma.", 
                 icon: "bot" 
             },
-            { id: 7, date: "25/04", title: "Física Experimental", description: "Aulas com princípios de física avançada com o professor Bruno da Universidade Federal do ABC. Esta Aula ser;a dada as 15 hs", icon: "test-tube" },
+            { id: 7, date: "25/04", title: "Física Experimental", description: "Aulas com princípios de física avançada com o professor Bruno da Universidade Federal do ABC.", icon: "test-tube" },
             { id: 8, date: "02/05", title: "Robótica", description: "Aprofundamento em projetos de engenharia e mecânica robótica.\n\nCom o Professor Rafael Traldi Moura da Poli USP", icon: "bot" },
-            { id: 10, date: "09/05", title: "Biologia e Genética", description: "Exploração de conceitos modernos de genética e biologia molecular.", icon: "test-tube" },
+            { 
+                id: 10, 
+                date: "09/05", 
+                title: "Biologia e Genética", 
+                description: "Nesta aula, a Helô, mãe do Ângelo vai nos ensinar a fazer um experimento para a extração de DNA de plantas. Este é um ótimo ponto de partida para todos os que quiserem aprofundar nos estudos de biotecnologia, melhoramento genético e identificação de espécies futuramente.", 
+                link: "./listadna.html",
+                linkText: "Clique aqui para a lista de materiais necessários",
+                icon: "test-tube" 
+            },
             { id: 17, date: "16/05", title: "Planos e Camadas", description: "Planos e Camadas: construindo o mundo um passo de cada vez.\n\nCom Prof. Tales Ebner, artista multidisciplinar.", icon: "layers" },
             { id: 11, date: "23/05", title: "Robótica", description: "Aula de Robótica e Lógica com o Prof. Rafael Traldi Moura.", icon: "bot" },
             { id: 12, date: "30/05", title: "Química", description: "Sobre a tabela periódica, os elementos raros e algumas mágicas.", icon: "flask-conical" },
@@ -138,7 +146,7 @@
 
                                 {event.link && (
                                     <div className="mt-2 p-3 bg-red-50 border border-red-100 rounded-lg flex items-center gap-2">
-                                        <Icon name="file-text" size={16} className="text-red-600" />
+                                        <Icon name="link" size={16} className="text-red-600" />
                                         <a 
                                             href={event.link} 
                                             target="_blank" 
